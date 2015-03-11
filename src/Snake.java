@@ -45,8 +45,6 @@ class Cobra{
 	Cobra(int x,int y,int length, Direction dir){
 		if(oposite(dir)){
 			direction = dir;
-			//		System.out.println(direction);
-
 			for (int i = 0; i < length; i++) {
 				int bodyX = x;
 				int bodyY = y;
@@ -63,11 +61,11 @@ class Cobra{
 				if (direction == Direction.LEFT)  {
 					bodyX = bodyX + i;
 				}
-
 				body.add(new Position(bodyX, bodyY));
 			}
 		}
 	}
+	
 	private boolean oposite(Direction dir) {
 		if(direction==Direction.LEFT && dir==Direction.RIGHT)
 			return false;
@@ -80,24 +78,25 @@ class Cobra{
 		else
 			return true;
 	}
+	
 	public boolean equals(Position pos){
 		if(body.get(0).x==pos.x && body.get(0).y==pos.y)
 			return true;
 		return false;
 
 	}
+	
 	public boolean hasEaten(LinkedList<Position> comida){
 
 		for(int i=0;i<comida.size();i++){
 			if(equals(comida.get(i))){
-
 				comida.set(i,new Position(rand.nextInt(90)+4, rand.nextInt(20)+4));
 				return true;
 			}
 		}	
 		return false;
-
 	}
+	
 	public boolean gotSpikes(LinkedList<Position> spikes){
 		for(int i=0;i<spikes.size();i++){
 			if(equals(spikes.get(i))){
@@ -105,8 +104,8 @@ class Cobra{
 			}
 		}	
 		return false;
-
 	}
+	
 	public boolean hitMe(Cobra snake){
 		for(int i=2;i<snake.body.size();i++){
 			if(snake.equals(snake.body.get(i))){
@@ -114,7 +113,6 @@ class Cobra{
 			}
 		}
 		return false;
-
 	}
 
 	public Direction getDirection() {
@@ -187,18 +185,21 @@ class Cobra{
 				body.get(0).setY(body.get(0).getY() + 1);
 			}
 		}
-
-
 	}
+	
 	public int getDificulty() {
 		return dificulty;
 	}
+	
 	public void setDificulty(int dificulty) {
 		this.dificulty = dificulty;
 	}
 }
 public class Snake
 {
+	private static final int HARD = 50;
+	private static final int MEDIUM = 100;
+	private static final int EASY = 150;
 	private Terminal term;
 	private int length =1;
 	Random rand=new Random();
@@ -209,8 +210,8 @@ public class Snake
 	private int randx=0;
 	private int randy=0;
 	private int score=0;
+	
 	public Snake(){
-
 		term = TerminalFacade.createTerminal();
 		term.enterPrivateMode();
 		MAX_X=term.getTerminalSize().getColumns();
@@ -220,16 +221,12 @@ public class Snake
 		Cobra snake=new Cobra(randx,randy,5,Direction.LEFT);
 		LinkedList<Position> food = new LinkedList<Position>();
 		LinkedList<Position> spikes = new LinkedList<Position>();
-
-
 		while (true){
 			term.applySGR(Terminal.SGR.ENTER_BOLD);
 			term.applyForegroundColor(Terminal.Color.GREEN);
 			term.setCursorVisible(false);
 			//MENU
-
 			if(!started){
-				System.out.println("MENU");
 				food=makeFood(new LinkedList<Position>());
 				spikes=makeSpikes(new LinkedList<Position>());
 				int y=13;
@@ -244,19 +241,19 @@ public class Snake
 						case Enter:
 							if(y==13){
 								snake = newSnake();
-								snake.setDificulty(150);
+								snake.setDificulty(EASY);
 								started=true;
 								end=false;
 							}
 							if(y==15){
 								snake=newSnake();
-								snake.setDificulty(100);
+								snake.setDificulty(MEDIUM);
 								started=true;
 								end=false;
 							}
 							if(y==17){	
 								snake=newSnake();
-								snake.setDificulty(50);
+								snake.setDificulty(HARD);
 								started=true;
 								end=false;
 							}
@@ -387,7 +384,6 @@ public class Snake
 	private void checkCrashed(Cobra snake, LinkedList<Position> spikes) {
 		boolean colided=snake.hitMe(snake);
 		if(snake.gotSpikes(spikes) || colided){
-			System.out.println(""+colided);
 			snake.crashed=true;
 			end=true;
 		}
@@ -395,11 +391,11 @@ public class Snake
 
 	private Cobra newSnake() {
 		Cobra snake;
-		snake=new Cobra(rand.nextInt(MAX_X-10)+5, rand.nextInt(MAX_Y-10)+3, 5, getDirection());
+		snake=new Cobra(rand.nextInt(MAX_X-10)+5, rand.nextInt(MAX_Y-10)+3, 5, getRandomDirection());
 		return snake;
 	}
 
-	private Direction getDirection() {
+	private Direction getRandomDirection() {
 		Random r= new Random();
 		int j= r.nextInt(4);
 		switch (j) {
@@ -415,7 +411,6 @@ public class Snake
 		default:
 			return null;
 		}
-
 	}
 
 	private void outOfBounds(Cobra snake) {
@@ -423,7 +418,6 @@ public class Snake
 			snake.crashed=true;
 			end=true;
 		}
-
 	}
 
 	private Cobra gameOver(Cobra snake, LinkedList<Position> food, LinkedList<Position> spikes) {
@@ -458,23 +452,20 @@ public class Snake
 			}
 			String scores="Your Score: "+Integer.toString(score);
 			String[] gameover={" ____    ____   _   _   ___  ",
-					           "|  __|  | __ | | | / | |  _| ",
+					           "|  __|  |  _ | | | | | |  _| ",
 					           "| | __  | |_|| |  |  | | |_  ",
 					           "| |_| | |  _ | |  _  | |  _| ",
 					           "|_____| |_| || |_| |_| |___| ",
 					           "                             ",
 					           " ____    _     _    ___   _____ ",
-					           "| __ |  | |   | |  |  _| | __  |",
+					           "|  _ |  | |   | |  |  _| |  _  |",
 					           "| | ||  |  | |  |  | |_  | |_| |",
 					           "| |_||   |     |   |  _| |    / ",
 					           "|____|    |___|    |___| |_| \\_\\"};
-			
 			show(scores,50-scores.length()/2,18);
 			for(int i=0;i<gameover.length;i++){
 				show(gameover[i],50-gameover[i].length()/2,5+i);
 			}
-			
-			
 			String trya="Try Again?";
 			show(trya,50-trya.length()/2,20);
 			String menugo="Go to Main Menu";
@@ -503,7 +494,6 @@ public class Snake
 			spikes=makeSpikes(new LinkedList<Position>());
 			end=false;
 			score=0;
-
 		}
 		if(y==22){
 			started=false;
@@ -541,23 +531,17 @@ public class Snake
 			Spikes.add(f);
 		}
 		return Spikes;
-
 	}
 
-	private void show(String str, int x, int y)
-	{
+	private void show(String str, int x, int y){
 		term.moveCursor(x, y);
-
 		int len = str.length();
-
-		for (int i = 0; i < len; i++)
-		{
+		for (int i = 0; i < len; i++){
 			term.putCharacter(str.charAt(i));
 		}
 	}
 
-	public static void main(String[] args)
-	{
+	public static void main(String[] args){
 		new Snake();
 	}
 }
