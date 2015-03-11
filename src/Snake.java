@@ -44,7 +44,7 @@ class Cobra{
 	private int dificulty=300;
 	Cobra(int x,int y,int length, Direction dir){
 		if(oposite(dir)){
-			direction = dir;
+			setDirection(dir);
 			for (int i = 0; i < length; i++) {
 				int bodyX = x;
 				int bodyY = y;
@@ -61,7 +61,7 @@ class Cobra{
 				if (direction == Direction.LEFT)  {
 					bodyX = bodyX + i;
 				}
-				body.add(new Position(bodyX, bodyY));
+				addEndOfTail(bodyX, bodyY);
 			}
 		}
 	}
@@ -87,7 +87,6 @@ class Cobra{
 	}
 	
 	public boolean hasEaten(LinkedList<Position> comida){
-
 		for(int i=0;i<comida.size();i++){
 			if(equals(comida.get(i))){
 				comida.set(i,new Position(rand.nextInt(90)+4, rand.nextInt(20)+4));
@@ -157,7 +156,7 @@ class Cobra{
 				auxx=body.getLast().getX();
 				auxy=body.getLast().getY()-1;
 			}
-			body.add(new Position(auxx,auxy));
+			addEndOfTail(auxx, auxy);
 			new Cobra(auxx, auxy, 1, direction);
 		}
 		if(oposite(dir)){
@@ -185,6 +184,10 @@ class Cobra{
 				body.get(0).setY(body.get(0).getY() + 1);
 			}
 		}
+	}
+
+	private void addEndOfTail(int auxx, int auxy) {
+		body.add(new Position(auxx,auxy));
 	}
 	
 	public int getDificulty() {
