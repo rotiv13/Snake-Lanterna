@@ -1,13 +1,8 @@
-
-
 import java.util.LinkedList;
 import java.util.Random;
-
 import com.googlecode.lanterna.*;
 import com.googlecode.lanterna.terminal.*;
-import com.googlecode.lanterna.terminal.Terminal.Color;
 import com.googlecode.lanterna.input.*;
-import com.googlecode.lanterna.input.Key.Kind;
 
 enum Direction{
 	UP,DOWN,RIGHT,LEFT
