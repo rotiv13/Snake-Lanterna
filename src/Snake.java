@@ -1,13 +1,8 @@
-
-
 import java.util.LinkedList;
 import java.util.Random;
-
 import com.googlecode.lanterna.*;
 import com.googlecode.lanterna.terminal.*;
-import com.googlecode.lanterna.terminal.Terminal.Color;
 import com.googlecode.lanterna.input.*;
-import com.googlecode.lanterna.input.Key.Kind;
 
 enum Direction{
 	UP,DOWN,RIGHT,LEFT
@@ -42,6 +37,9 @@ class Cobra{
 	boolean crashed=false;
 	boolean eat=false;
 	private int dificulty=300;
+	private static final int HARD = 50;
+	private static final int MEDIUM = 100;
+	private static final int EASY = 150;
 	Cobra(int x,int y,int length, Direction dir){
 		if(oposite(dir)){
 			setDirection(dir);
@@ -65,11 +63,11 @@ class Cobra{
 			}
 		}
 	}
-/**
- * Checks if the direction you provided is opposite to the direction of the snake
- * @param dir
- * @return
- */
+	/**
+	 * Checks if the direction you provided is opposite to the direction of the snake
+	 * @param dir
+	 * @return
+	 */
 	private boolean oposite(Direction dir) {
 		if(direction==Direction.LEFT && dir==Direction.RIGHT)
 			return false;
@@ -89,12 +87,13 @@ class Cobra{
 		return false;
 
 	}
-/**
- * Checks if the snake has eaten a fruit
- * @param comida
- * @return
- */
+	/**
+	 * Checks if the snake has eaten a fruit
+	 * @param comida
+	 * @return
+	 */
 	public boolean hasEaten(LinkedList<Position> comida){
+
 		for(int i=0;i<comida.size();i++){
 			if(equals(comida.get(i))){
 				comida.set(i,new Position(rand.nextInt(90)+4, rand.nextInt(20)+4));
@@ -103,24 +102,25 @@ class Cobra{
 		}	
 		return false;
 	}
-/**
- * Checks if the snake has collided with a spike
- * @param spikes
- * @return
- */
+	/**
+	 * Checks if the snake has collided with a spike
+	 * @param spikes
+	 * @return
+	 */
 	public boolean gotSpikes(LinkedList<Position> spikes){
 		for(int i=0;i<spikes.size();i++){
 			if(equals(spikes.get(i))){
 				return true;
 			}
 		}	
+
 		return false;
 	}
-/**
- * Check if it collided with itself
- * @param snake
- * @return
- */
+	/**
+	 * Check if it collided with itself
+	 * @param snake
+	 * @return
+	 */
 	public boolean hitMe(Cobra snake){
 		for(int i=2;i<snake.body.size();i++){
 			if(snake.equals(snake.body.get(i))){
@@ -149,20 +149,20 @@ class Cobra{
 	public void makestep(){
 		makeStep(direction);
 	}
-/**
- * Pushes forward in that direction dir
- * @param dir
- */
+	/**
+	 * Pushes forward in that direction dir
+	 * @param dir
+	 */
 	public void makeStep(Direction dir){
 		if(crashed)
 			return;
 		eatAndGrow();
 		dontGoTheOppositeDirection(dir);
 	}
-/**
- * Prevents the snake on colliding with itself when pressing an opposite direction of which the snake is going
- * @param dir
- */
+	/**
+	 * Prevents the snake on colliding with itself when pressing an opposite direction of which the snake is going
+	 * @param dir
+	 */
 	private void dontGoTheOppositeDirection(Direction dir) {
 		if(oposite(dir)){
 			this.direction=dir;
@@ -237,9 +237,9 @@ class Cobra{
  */
 public class Snake
 {
-	private static final int HARD = 50;
-	private static final int MEDIUM = 100;
-	private static final int EASY = 150;
+	private static final int HARD = 20;
+	private static final int MEDIUM = 70;
+	private static final int EASY = 120;
 	private Terminal term;
 	private int length =1;
 	Random rand=new Random();
@@ -419,10 +419,10 @@ public class Snake
 					break;
 				}
 
-				
-				
-				
-				
+
+
+
+
 				term.clearScreen();
 				printScore(snake, food);
 				printSnake(snake);
@@ -483,7 +483,7 @@ public class Snake
 			}
 		}
 		try{
-			Thread.sleep(50);
+			Thread.sleep(100);
 		}
 		catch (InterruptedException ie){
 			ie.printStackTrace();
@@ -664,7 +664,8 @@ public class Snake
 	private LinkedList<Position> makeFood(LinkedList<Position> food) {
 		Random r=new Random();
 		Position f;
-		for(int i=0;i<4;i++){
+
+		for(int i=0;i<5;i++){
 			f=new Position(r.nextInt(90)+3, r.nextInt(20)+3);
 			food.add(f);
 		}
@@ -678,8 +679,8 @@ public class Snake
 	private LinkedList<Position> makeSpikes(LinkedList<Position> spikes) {
 		Random r=new Random();
 		Position f;
-		for(int i=0;i<4;i++){
-			f=new Position(r.nextInt(90)+3, r.nextInt(20)+3);
+		for(int i=0;i<10;i++){
+			f=new Position(r.nextInt(80)+3, r.nextInt(18)+3);
 			spikes.add(f);
 		}
 		return spikes;
