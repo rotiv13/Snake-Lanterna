@@ -469,7 +469,6 @@ public class Snake
 					           "| |_||   |     |   |  _| |    / ",
 					           "|____|    |___|    |___| |_| \\_\\"};
 			
-			
 			show(scores,50-scores.length()/2,18);
 			for(int i=0;i<gameover.length;i++){
 				show(gameover[i],50-gameover[i].length()/2,5+i);
