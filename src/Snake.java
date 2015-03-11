@@ -65,11 +65,7 @@ class Cobra{
 			}
 		}
 	}
-/**
- * Checks if the direction you provided is opposite to the direction of the snake
- * @param dir
- * @return
- */
+
 	private boolean oposite(Direction dir) {
 		if(direction==Direction.LEFT && dir==Direction.RIGHT)
 			return false;
@@ -89,11 +85,7 @@ class Cobra{
 		return false;
 
 	}
-/**
- * Checks if the snake has eaten a fruit
- * @param comida
- * @return
- */
+
 	public boolean hasEaten(LinkedList<Position> comida){
 		for(int i=0;i<comida.size();i++){
 			if(equals(comida.get(i))){
@@ -103,11 +95,7 @@ class Cobra{
 		}	
 		return false;
 	}
-/**
- * Checks if the snake has collided with a spike
- * @param spikes
- * @return
- */
+
 	public boolean gotSpikes(LinkedList<Position> spikes){
 		for(int i=0;i<spikes.size();i++){
 			if(equals(spikes.get(i))){
@@ -116,11 +104,7 @@ class Cobra{
 		}	
 		return false;
 	}
-/**
- * Check if it collided with itself
- * @param snake
- * @return
- */
+
 	public boolean hitMe(Cobra snake){
 		for(int i=2;i<snake.body.size();i++){
 			if(snake.equals(snake.body.get(i))){
@@ -149,20 +133,14 @@ class Cobra{
 	public void makestep(){
 		makeStep(direction);
 	}
-/**
- * Pushes forward in that direction dir
- * @param dir
- */
+
 	public void makeStep(Direction dir){
 		if(crashed)
 			return;
 		eatAndGrow();
 		dontGoTheOppositeDirection(dir);
 	}
-/**
- * Prevents the snake on colliding with itself when pressing an opposite direction of which the snake is going
- * @param dir
- */
+
 	private void dontGoTheOppositeDirection(Direction dir) {
 		if(oposite(dir)){
 			this.direction=dir;
@@ -190,9 +168,7 @@ class Cobra{
 			}
 		}
 	}
-	/**
-	 * Checks if the snake has eaten and makes it grow
-	 */
+
 	private void eatAndGrow() {
 		if(eat){
 			int auxx = 0;
@@ -230,11 +206,6 @@ class Cobra{
 		this.dificulty = dificulty;
 	}
 }
-
-/**
- * @author Vitor Afonso up200908303
- *
- */
 public class Snake
 {
 	private static final int HARD = 50;
@@ -262,7 +233,9 @@ public class Snake
 		LinkedList<Position> food = new LinkedList<Position>();
 		LinkedList<Position> spikes = new LinkedList<Position>();
 		while (true){
-			terminalSettings();
+			term.applySGR(Terminal.SGR.ENTER_BOLD);
+			term.applyForegroundColor(Terminal.Color.GREEN);
+			term.setCursorVisible(false);
 			//MENU
 			if(!started){
 				food=makeFood(new LinkedList<Position>());
@@ -304,18 +277,69 @@ public class Snake
 						case ArrowUp:
 							if( y>13 && y<=17)
 								y-=2;
-							break;
-						default:
 							break;					
 						}
 					}
-					printWelcomeMenu(y);
+					String welcome="Welcome to Snake!";
+					show(welcome,50-welcome.length()/2,9);
+					show("Easy", 48,13);
+					show("Medium", 48,15);
+					show("Hard", 48,17);
+					show("->",45,y);
+					try{
+						Thread.sleep(200);
+					}
+					catch (InterruptedException ie){
+						ie.printStackTrace();
+					}
 				}
 			}
 			//MENU FIM
 			printFoodSpikes(food, spikes);
 			//MUDANÇAS DE DIRECÇÃO
-			whichWay(snake, food);
+			if(!end && !snake.crashed){
+				printBorders();
+				term.flush();
+				Key k = term.readInput();
+				if (k != null) {
+					started=true;
+					switch (k.getKind()) {
+					case Escape:
+						term.exitPrivateMode();
+						end=true;
+						return;
+					case ArrowLeft: 
+						randx-=1;
+						new Cobra(randx, randy,length, Direction.LEFT);
+						snake.makeStep(Direction.LEFT);
+						break;
+					case ArrowRight:
+						randx+=1;
+						new Cobra(randx, randy,length, Direction.RIGHT);
+						snake.makeStep(Direction.RIGHT);
+						break;
+					case ArrowDown:
+						randy+=1;
+						new Cobra(randx, randy,length, Direction.DOWN);
+						snake.makeStep(Direction.DOWN);
+						break;
+					case ArrowUp:
+						randy-=1;
+						new Cobra(randx,randy,length, Direction.UP);
+						snake.makeStep(Direction.UP);
+						break;
+					}
+
+					term.clearScreen();
+					printScore(snake, food);
+					printSnake(snake);
+				}
+				//ANDA NA MESMA DIRECÇÃO
+				else{
+
+					keepGoing(snake, food);
+				}
+			}
 			checkCrashed(snake, spikes);
 			outOfBounds(snake);
 			//GAME OVER
@@ -327,86 +351,6 @@ public class Snake
 		}
 	}
 
-	/**
-	 * Change settings of the menu
-	 */
-	private void terminalSettings() {
-		term.applySGR(Terminal.SGR.ENTER_BOLD);
-		term.applyForegroundColor(Terminal.Color.GREEN);
-		term.setCursorVisible(false);
-	}
-	/**
-	 * Prints Welcoming Menu
-	 * @param y
-	 */
-	private void printWelcomeMenu(int y) {
-		String welcome="Welcome to Snake!";
-		show(welcome,50-welcome.length()/2,9);
-		show("Easy", 48,13);
-		show("Medium", 48,15);
-		show("Hard", 48,17);
-		show("->",45,y);
-		try{
-			Thread.sleep(200);
-		}
-		catch (InterruptedException ie){
-			ie.printStackTrace();
-		}
-	}
-	/**
-	 * Moving snake same direction or change direction
-	 * @param snake
-	 * @param food
-	 */
-	private void whichWay(Cobra snake, LinkedList<Position> food) {
-		if(!end && !snake.crashed){
-			printBorders();
-			term.flush();
-			Key k = term.readInput();
-			if (k != null) {
-				started=true;
-				switch (k.getKind()) {
-				case Escape:
-					term.exitPrivateMode();
-					end=true;
-					return;
-				case ArrowLeft: 
-					randx-=1;
-					new Cobra(randx, randy,length, Direction.LEFT);
-					snake.makeStep(Direction.LEFT);
-					break;
-				case ArrowRight:
-					randx+=1;
-					new Cobra(randx, randy,length, Direction.RIGHT);
-					snake.makeStep(Direction.RIGHT);
-					break;
-				case ArrowDown:
-					randy+=1;
-					new Cobra(randx, randy,length, Direction.DOWN);
-					snake.makeStep(Direction.DOWN);
-					break;
-				case ArrowUp:
-					randy-=1;
-					new Cobra(randx,randy,length, Direction.UP);
-					snake.makeStep(Direction.UP);
-					break;
-				default:
-					break;
-				}
-
-				term.clearScreen();
-				printScore(snake, food);
-				printSnake(snake);
-			}
-			else{
-				keepGoing(snake, food);
-			}
-		}
-	}
-	/**
-	 * Print snake
-	 * @param snake
-	 */
 	private void printSnake(Cobra snake) {
 		for(Position pos:snake.body){
 			if(pos.equals(snake.body.get(0))){
@@ -417,22 +361,14 @@ public class Snake
 		}
 		term.flush();
 	}
-	/**
-	 * Print Score to Teminal
-	 * @param snake
-	 * @param food
-	 */
+
 	private void printScore(Cobra snake, LinkedList<Position> food) {
 		snake.eat=snake.hasEaten(food);
 		if(snake.eat)
 			score+=10;
 		show("Score: "+Integer.toString(score),50,0);
 	}
-	/**
-	 * Snake keeps moving on the direction of the last step
-	 * @param snake
-	 * @param food
-	 */
+
 	private void keepGoing(Cobra snake, LinkedList<Position> food) {
 		if(started){
 			snake.makestep();
@@ -447,9 +383,7 @@ public class Snake
 			}
 		}
 	}
-	/**
-	 * Printing Borders
-	 */
+
 	private void printBorders() {
 		for(int i=2;i<MAX_X-2;i++){
 			for(int r=2;r<MAX_Y-2;r++){
@@ -466,11 +400,7 @@ public class Snake
 			ie.printStackTrace();
 		}
 	}
-	/**
-	 * See if the snake hit something or itself
-	 * @param snake
-	 * @param spikes
-	 */
+
 	private void checkCrashed(Cobra snake, LinkedList<Position> spikes) {
 		boolean colided=snake.hitMe(snake);
 		if(snake.gotSpikes(spikes) || colided){
@@ -478,19 +408,13 @@ public class Snake
 			end=true;
 		}
 	}
-	/**
-	 * Creates new random snake
-	 * @return
-	 */
+
 	private Cobra newSnake() {
 		Cobra snake;
 		snake=new Cobra(rand.nextInt(MAX_X-10)+5, rand.nextInt(MAX_Y-10)+3, 5, getRandomDirection());
 		return snake;
 	}
-	/**
-	 * Gives a random direction
-	 * @return 
-	 */
+
 	private Direction getRandomDirection() {
 		Random r= new Random();
 		int j= r.nextInt(4);
@@ -508,23 +432,14 @@ public class Snake
 			return null;
 		}
 	}
-	/**
-	 * Check if the snake is out of the arena
-	 * @param snake
-	 */
+
 	private void outOfBounds(Cobra snake) {
 		if(snake.body.getFirst().x<3 || snake.body.getFirst().y<3 || snake.body.getFirst().x>96 || snake.body.getFirst().y>26){
 			snake.crashed=true;
 			end=true;
 		}
 	}
-	/**
-	 * Game Over
-	 * @param snake
-	 * @param food
-	 * @param spikes
-	 * @return
-	 */
+
 	private Cobra gameOver(Cobra snake, LinkedList<Position> food, LinkedList<Position> spikes) {
 		int dificulty=snake.getDificulty();
 		int y=20;
@@ -552,8 +467,6 @@ public class Snake
 						x=40;
 						y-=2;
 					}
-					break;
-				default:
 					break;					
 				}
 			}
@@ -562,11 +475,7 @@ public class Snake
 		return snake;
 
 	}
-	/**
-	 * Prints the game over sign
-	 * @param y
-	 * @param x
-	 */
+
 	private void gameOverScreen(int y, int x) {
 		String scores="Your Score: "+Integer.toString(score);
 		String[] gameover={" ____    ____   _   _   ___  ",
@@ -596,19 +505,17 @@ public class Snake
 			ie.printStackTrace();
 		}
 	}
-	/**
-	 * Check which of the selections on the game over screen has been selected
-	 * @param snake
-	 * @param dificulty
-	 * @param y
-	 * @return
-	 */
+
 	private Cobra gameOverRestart(Cobra snake, int dificulty, int y) {
+		LinkedList<Position> food;
+		LinkedList<Position> spikes;
 		if(y==20){
 			started=true;
 			snake=newSnake();
 			snake.setDificulty(dificulty);
 			snake.crashed=false;
+			food=makeFood(new LinkedList<Position>());
+			spikes=makeSpikes(new LinkedList<Position>());
 			end=false;
 			score=0;
 		}
@@ -619,11 +526,7 @@ public class Snake
 		}
 		return snake;
 	}
-	/**
-	 * Prints all the obstacles/objectives on the board
-	 * @param food
-	 * @param spikes
-	 */
+
 	private void printFoodSpikes(LinkedList<Position> food,
 			LinkedList<Position> spikes) {
 		for(Position p:food){
@@ -633,11 +536,7 @@ public class Snake
 			show("✴",p.x,p.y);
 		}
 	}
-	/**
-	 * Makes food for the snake to eat
-	 * @param food
-	 * @return
-	 */
+
 	private LinkedList<Position> makeFood(LinkedList<Position> food) {
 		Random r=new Random();
 		Position f;
@@ -647,11 +546,7 @@ public class Snake
 		}
 		return food;
 	}
-	/**
-	 * Makes those nasty obstacles
-	 * @param spikes
-	 * @return
-	 */
+
 	private LinkedList<Position> makeSpikes(LinkedList<Position> spikes) {
 		Random r=new Random();
 		Position f;
@@ -661,12 +556,7 @@ public class Snake
 		}
 		return spikes;
 	}
-	/**
-	 * Gets every caracter on the terminal
-	 * @param str
-	 * @param x
-	 * @param y
-	 */
+
 	private void show(String str, int x, int y){
 		term.moveCursor(x, y);
 		int len = str.length();
