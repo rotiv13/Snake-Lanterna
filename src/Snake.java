@@ -64,6 +64,7 @@ class Cobra{
 			}
 		}
 	}
+	
 	/**
 	 * Checks if the direction you provided is opposite to the direction of the snake
 	 * @param dir
@@ -88,6 +89,7 @@ class Cobra{
 		return false;
 
 	}
+	
 	/**
 	 * Checks if the snake has eaten a fruit
 	 * @param comida
@@ -103,6 +105,7 @@ class Cobra{
 		}	
 		return false;
 	}
+	
 	/**
 	 * Checks if the snake has collided with a spike
 	 * @param spikes
@@ -116,6 +119,7 @@ class Cobra{
 		}	
 		return false;
 	}
+	
 	/**
 	 * Check if it collided with itself
 	 * @param snake
@@ -149,6 +153,7 @@ class Cobra{
 	public void makestep(){
 		makeStep(direction);
 	}
+	
 	/**
 	 * Pushes forward in that direction dir
 	 * @param dir
@@ -159,6 +164,7 @@ class Cobra{
 		eatAndGrow();
 		dontGoTheOppositeDirection(dir);
 	}
+	
 	/**
 	 * Prevents the snake on colliding with itself when pressing an opposite direction of which the snake is going
 	 * @param dir
@@ -190,6 +196,7 @@ class Cobra{
 			}
 		}
 	}
+	
 	/**
 	 * Checks if the snake has eaten and makes it grow
 	 */
@@ -350,6 +357,7 @@ public class Snake
 		term.applyForegroundColor(Terminal.Color.GREEN);
 		term.setCursorVisible(false);
 	}
+	
 	/**
 	 * Prints Welcoming Menu
 	 * @param y
@@ -371,6 +379,7 @@ public class Snake
 			ie.printStackTrace();
 		}
 	}
+	
 	/**
 	 * Determines postion so that the string can be at the middle of the screen
 	 * @param easy2
