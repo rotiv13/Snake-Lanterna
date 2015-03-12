@@ -37,6 +37,9 @@ class Cobra{
 	boolean crashed=false;
 	boolean eat=false;
 	private int dificulty=300;
+	private static final int HARD = 50;
+	private static final int MEDIUM = 100;
+	private static final int EASY = 150;
 	Cobra(int x,int y,int length, Direction dir){
 		if(oposite(dir)){
 			setDirection(dir);
@@ -60,11 +63,11 @@ class Cobra{
 			}
 		}
 	}
-/**
- * Checks if the direction you provided is opposite to the direction of the snake
- * @param dir
- * @return
- */
+	/**
+	 * Checks if the direction you provided is opposite to the direction of the snake
+	 * @param dir
+	 * @return
+	 */
 	private boolean oposite(Direction dir) {
 		if(direction==Direction.LEFT && dir==Direction.RIGHT)
 			return false;
@@ -84,12 +87,13 @@ class Cobra{
 		return false;
 
 	}
-/**
- * Checks if the snake has eaten a fruit
- * @param comida
- * @return
- */
-	public boolean hasEaten(LinkedList<Position> comida){
+	/**
+	 * Checks if the snake has eaten a fruit
+	 * @param comida
+	 * @param snake 
+	 * @return
+	 */
+	public boolean hasEaten(LinkedList<Position> comida, Cobra snake){
 		for(int i=0;i<comida.size();i++){
 			if(equals(comida.get(i))){
 				comida.set(i,new Position(rand.nextInt(90)+4, rand.nextInt(20)+4));
@@ -98,11 +102,11 @@ class Cobra{
 		}	
 		return false;
 	}
-/**
- * Checks if the snake has collided with a spike
- * @param spikes
- * @return
- */
+	/**
+	 * Checks if the snake has collided with a spike
+	 * @param spikes
+	 * @return
+	 */
 	public boolean gotSpikes(LinkedList<Position> spikes){
 		for(int i=0;i<spikes.size();i++){
 			if(equals(spikes.get(i))){
@@ -111,11 +115,11 @@ class Cobra{
 		}	
 		return false;
 	}
-/**
- * Check if it collided with itself
- * @param snake
- * @return
- */
+	/**
+	 * Check if it collided with itself
+	 * @param snake
+	 * @return
+	 */
 	public boolean hitMe(Cobra snake){
 		for(int i=2;i<snake.body.size();i++){
 			if(snake.equals(snake.body.get(i))){
@@ -144,20 +148,20 @@ class Cobra{
 	public void makestep(){
 		makeStep(direction);
 	}
-/**
- * Pushes forward in that direction dir
- * @param dir
- */
+	/**
+	 * Pushes forward in that direction dir
+	 * @param dir
+	 */
 	public void makeStep(Direction dir){
 		if(crashed)
 			return;
 		eatAndGrow();
 		dontGoTheOppositeDirection(dir);
 	}
-/**
- * Prevents the snake on colliding with itself when pressing an opposite direction of which the snake is going
- * @param dir
- */
+	/**
+	 * Prevents the snake on colliding with itself when pressing an opposite direction of which the snake is going
+	 * @param dir
+	 */
 	private void dontGoTheOppositeDirection(Direction dir) {
 		if(oposite(dir)){
 			this.direction=dir;
@@ -260,7 +264,11 @@ public class Snake
 			terminalSettings();
 			//MENU
 			if(!started){
-				food=makeFood(new LinkedList<Position>());
+				if(snake.eat && snake.getDificulty()==HARD){
+					food=makeFood(new LinkedList<Position>());
+				}
+				else
+					food=makeFood(new LinkedList<Position>());
 				spikes=makeSpikes(new LinkedList<Position>());
 				int y=13;
 				while(!started){
@@ -413,11 +421,6 @@ public class Snake
 				default:
 					break;
 				}
-
-				
-				
-				
-				
 				term.clearScreen();
 				printScore(snake, food);
 				printSnake(snake);
@@ -447,7 +450,7 @@ public class Snake
 	 * @param food
 	 */
 	private void printScore(Cobra snake, LinkedList<Position> food) {
-		snake.eat=snake.hasEaten(food);
+		snake.eat=snake.hasEaten(food,snake);
 		if(snake.eat)
 			score+=10;
 		show("Score: "+Integer.toString(score),50,0);
