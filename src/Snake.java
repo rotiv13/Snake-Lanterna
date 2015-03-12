@@ -1,5 +1,6 @@
 import java.util.LinkedList;
 import java.util.Random;
+
 import com.googlecode.lanterna.*;
 import com.googlecode.lanterna.terminal.*;
 import com.googlecode.lanterna.input.*;
@@ -37,9 +38,9 @@ class Cobra{
 	boolean crashed=false;
 	boolean eat=false;
 	private int dificulty=300;
-	private static final int HARD = 50;
-	private static final int MEDIUM = 100;
-	private static final int EASY = 150;
+	private static final int HARD = 20;
+	private static final int MEDIUM = 70;
+	private static final int EASY = 120;
 	Cobra(int x,int y,int length, Direction dir){
 		if(oposite(dir)){
 			setDirection(dir);
@@ -236,9 +237,9 @@ class Cobra{
  */
 public class Snake
 {
-	private static final int HARD = 50;
-	private static final int MEDIUM = 100;
-	private static final int EASY = 150;
+	private static final int HARD = 20;
+	private static final int MEDIUM = 70;
+	private static final int EASY = 120;
 	private Terminal term;
 	private int length =1;
 	Random rand=new Random();
@@ -249,7 +250,7 @@ public class Snake
 	private int randx=0;
 	private int randy=0;
 	private int score=0;
-
+	private int bonus=50;
 	public Snake(){
 		term = TerminalFacade.createTerminal();
 		term.enterPrivateMode();
@@ -264,7 +265,7 @@ public class Snake
 			terminalSettings();
 			//MENU
 			if(!started){
-				
+
 				int y=13;
 				while(!started){
 					term.clearScreen();
@@ -291,7 +292,7 @@ public class Snake
 					}
 					printWelcomeMenu(y);
 				}
-				
+
 				food=makeFood(new LinkedList<Position>(), snake);
 				spikes=makeSpikes(new LinkedList<Position>(), snake);
 				System.out.println("food:"+food.size());
@@ -429,6 +430,11 @@ public class Snake
 				keepGoing(snake, food);
 			}
 		}
+		if(bonus<=0)
+			bonus=0;
+		else{
+			bonus-=1;
+		}
 	}
 	/**
 	 * Print snake
@@ -451,9 +457,12 @@ public class Snake
 	 */
 	private void printScore(Cobra snake, LinkedList<Position> food) {
 		snake.eat=snake.hasEaten(food,snake);
-		if(snake.eat)
-			score+=10;
-		show("Score: "+Integer.toString(score),50,0);
+		if(snake.eat){
+			score+=100+bonus;
+			bonus=50;
+		}
+		String scorePlusBonus = "Score: "+Integer.toString(score)+"      Bonus: "+Integer.toString(bonus);
+		show(scorePlusBonus,calcPosition(scorePlusBonus),0);
 	}
 	/**
 	 * Snake keeps moving on the direction of the last step
@@ -662,15 +671,18 @@ public class Snake
 	private LinkedList<Position> makeFood(LinkedList<Position> food, Cobra snake) {
 		Random r=new Random();
 		int size=0;
-		if(snake.getDificulty()==EASY)
+		if(snake.getDificulty()==EASY){
 			System.out.println("easy");
 			size=15;
-		if(snake.getDificulty()==MEDIUM)
+		}
+		if(snake.getDificulty()==MEDIUM){
 			System.out.println("medium");
 			size=10;
-		if(snake.getDificulty()==HARD)
+		}
+		if(snake.getDificulty()==HARD){
 			System.out.println("hard");
 			size=5;
+		}
 		food=produceFood(food, r, size);
 
 		return food;
