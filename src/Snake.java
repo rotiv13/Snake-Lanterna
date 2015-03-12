@@ -264,12 +264,7 @@ public class Snake
 			terminalSettings();
 			//MENU
 			if(!started){
-				if(snake.eat && snake.getDificulty()==HARD){
-					food=makeFood(new LinkedList<Position>());
-				}
-				else
-					food=makeFood(new LinkedList<Position>());
-				spikes=makeSpikes(new LinkedList<Position>());
+				
 				int y=13;
 				while(!started){
 					term.clearScreen();
@@ -296,6 +291,11 @@ public class Snake
 					}
 					printWelcomeMenu(y);
 				}
+				
+				food=makeFood(new LinkedList<Position>(), snake);
+				spikes=makeSpikes(new LinkedList<Position>(), snake);
+				System.out.println("food:"+food.size());
+				System.out.println("spikes:"+spikes.size());
 			}
 			//MENU FIM
 			printFoodSpikes(food, spikes);
@@ -659,10 +659,32 @@ public class Snake
 	 * @param food
 	 * @return
 	 */
-	private LinkedList<Position> makeFood(LinkedList<Position> food) {
+	private LinkedList<Position> makeFood(LinkedList<Position> food, Cobra snake) {
 		Random r=new Random();
+		int size=0;
+		if(snake.getDificulty()==EASY)
+			System.out.println("easy");
+			size=15;
+		if(snake.getDificulty()==MEDIUM)
+			System.out.println("medium");
+			size=10;
+		if(snake.getDificulty()==HARD)
+			System.out.println("hard");
+			size=5;
+		food=produceFood(food, r, size);
+
+		return food;
+	}
+
+	/**
+	 * @param food
+	 * @param r
+	 * @param size
+	 * @return 
+	 */
+	private LinkedList<Position> produceFood(LinkedList<Position> food, Random r, int size) {
 		Position f;
-		for(int i=0;i<4;i++){
+		for(int i=0;i<size;i++){
 			f=new Position(r.nextInt(90)+3, r.nextInt(20)+3);
 			food.add(f);
 		}
@@ -673,10 +695,28 @@ public class Snake
 	 * @param spikes
 	 * @return
 	 */
-	private LinkedList<Position> makeSpikes(LinkedList<Position> spikes) {
+	private LinkedList<Position> makeSpikes(LinkedList<Position> spikes, Cobra snake) {
 		Random r=new Random();
+		int size=0;
+		if(snake.getDificulty()==EASY)
+			size=10;
+		if(snake.getDificulty()==MEDIUM)
+			size=20;
+		if(snake.getDificulty()==HARD)
+			size=35;
+		spikes=produceSpikes(spikes, r, size);
+		return spikes;
+	}
+
+	/**
+	 * @param spikes
+	 * @param r
+	 * @param size
+	 * @return 
+	 */
+	private LinkedList<Position> produceSpikes(LinkedList<Position> spikes, Random r, int size) {
 		Position f;
-		for(int i=0;i<4;i++){
+		for(int i=0;i<size;i++){
 			f=new Position(r.nextInt(90)+3, r.nextInt(20)+3);
 			spikes.add(f);
 		}
