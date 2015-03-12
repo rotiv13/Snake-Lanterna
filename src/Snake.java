@@ -475,6 +475,7 @@ public class Snake
 			term.clearScreen();
 			printScore(snake, food);
 			printSnake(snake);
+
 		}
 	}
 	/**
