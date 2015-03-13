@@ -265,7 +265,7 @@ public class Snake
 		MAX_Y=term.getTerminalSize().getRows();
 		randy=rand.nextInt(MAX_Y-10)+3;
 		randx=rand.nextInt(MAX_X-10)+5;
-		Cobra snake=new Cobra(randx,randy,5,Direction.LEFT);
+		Cobra snake=newSnake();
 		LinkedList<Position> food = new LinkedList<Position>();
 		LinkedList<Position> spikes = new LinkedList<Position>();
 		while (true){
@@ -302,8 +302,6 @@ public class Snake
 
 				food=makeFood(new LinkedList<Position>(), snake);
 				spikes=makeSpikes(new LinkedList<Position>(), snake);
-				System.out.println("food:"+food.size());
-				System.out.println("spikes:"+spikes.size());
 			}
 			//MENU FIM
 			printFoodSpikes(food, spikes);
@@ -529,7 +527,7 @@ public class Snake
 	 */
 	private Cobra newSnake() {
 		Cobra snake;
-		snake=new Cobra(rand.nextInt(MAX_X-10)+5, rand.nextInt(MAX_Y-10)+3, 5, getRandomDirection());
+		snake=new Cobra(rand.nextInt(MAX_X-20)+10, rand.nextInt(MAX_Y-10)+5, 5, getRandomDirection());
 		return snake;
 	}
 	
@@ -693,15 +691,12 @@ public class Snake
 		Random r=new Random();
 		int size=0;
 		if(snake.getDificulty()==EASY){
-			System.out.println("easy");
 			size=15;
 		}
 		if(snake.getDificulty()==MEDIUM){
-			System.out.println("medium");
 			size=10;
 		}
 		if(snake.getDificulty()==HARD){
-			System.out.println("hard");
 			size=5;
 		}
 		food=produceFood(food, r, size);
@@ -775,4 +770,3 @@ public class Snake
 		new Snake();
 	}
 }
-
