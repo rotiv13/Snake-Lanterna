@@ -240,7 +240,7 @@ class Cobra{
 
 /**
  * @author Vitor Afonso up200908303
- *
+ * @author Jorge Silva up201002605 
  */
 public class Snake
 {
