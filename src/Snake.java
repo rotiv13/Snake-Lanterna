@@ -38,9 +38,6 @@ class Cobra{
 	boolean crashed=false;
 	boolean eat=false;
 	private int dificulty=300;
-	private static final int HARD = 20;
-	private static final int MEDIUM = 70;
-	private static final int EASY = 120;
 	Cobra(int x,int y,int length, Direction dir){
 		if(oposite(dir)){
 			setDirection(dir);
