@@ -251,6 +251,7 @@ public class Snake
 	private int MAX_X;
 	boolean started=false;
 	boolean end=false;
+	boolean pause=false;
 	private int randx=0;
 	private int randy=0;
 	private int score=0;
@@ -398,6 +399,7 @@ public class Snake
 			Key k = term.readInput();
 			if (k != null) {
 				started=true;
+				pause=true;
 				switch (k.getKind()) {
 				case Escape:
 					term.exitPrivateMode();
@@ -431,7 +433,9 @@ public class Snake
 				printSnake(snake);
 			}
 			else{
+				if(pause==true)
 				keepGoing(snake, food);
+				printSnake(snake);
 			}
 		}
 		if(bonus<=0)
