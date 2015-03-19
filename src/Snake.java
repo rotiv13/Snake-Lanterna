@@ -380,6 +380,7 @@ public class Snake
 		if(gametimer==0)
 			pause=false;
 		gametimer-=10;
+		bonus=50;
 		try{
 			Thread.sleep(800);
 		}
@@ -545,14 +546,6 @@ public class Snake
 		if(snake.getDificulty()==MEDIUM){
 			for(int i=2;i<MAX_X-2;i++){
 				for(int r=2;r<MAX_Y-2;r++){
-					if(i==2 || i==97){
-						aux= new Position(i, r);
-						border.add(aux);
-					}
-					if(r==2 || r==27){
-						aux= new Position(i, r);
-						border.add(aux);
-					}
 					if(i==MAX_X/2 && r>(MAX_Y/2)-5 && r<(MAX_Y/2)+5){
 						aux= new Position(i, r);
 						border.add(aux);						
@@ -567,14 +560,6 @@ public class Snake
 		if(snake.getDificulty()==HARD){
 			for(int i=2;i<MAX_X-2;i++){
 				for(int r=2;r<MAX_Y-2;r++){
-					if(i==2 || i==97){
-						aux= new Position(i, r);
-						border.add(aux);
-					}
-					if(r==2 || r==27){
-						aux= new Position(i, r);
-						border.add(aux);
-					}
 					if(i==MAX_X/2){
 						if(r>2 && r<(MAX_Y/2)-5){
 							aux= new Position(i, r);
