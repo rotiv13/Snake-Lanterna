@@ -80,11 +80,71 @@ class Cobra{
 			return true;
 	}
 
+	/**
+	 * Prevents the snake on colliding with itself when pressing an opposite direction of which the snake is going
+	 * @param dir
+	 */
+	private void dontGoTheOppositeDirection(Direction dir) {
+		if(oposite(dir)){
+			this.direction=dir;
+			try{
+				Thread.sleep(getDificulty());
+			}
+			catch(InterruptedException ie){
+				ie.printStackTrace();
+			}
+			for (int i = body.size() - 1; i > 0; i--) {
+				body.get(i).setX(body.get(i - 1).getX());
+				body.get(i).setY(body.get(i - 1).getY()); 
+			} 
+			if (direction == Direction.LEFT) {
+				body.get(0).setX(body.get(0).getX() - 1); 
+			}
+			if (direction == Direction.RIGHT) {
+				body.get(0).setX(body.get(0).getX() + 1); 
+			}
+			if (direction == Direction.UP) { 
+				body.get(0).setY(body.get(0).getY() - 1);
+			}
+			if (direction == Direction.DOWN) { 
+				body.get(0).setY(body.get(0).getY() + 1);
+			}
+		}
+	}
+
 	public boolean equals(Position pos){
 		if(body.get(0).x==pos.x && body.get(0).y==pos.y)
 			return true;
 		return false;
 
+	}
+
+	/**
+	 * Checks if the snake has eaten and makes it grow
+	 */
+	private void eatAndGrow() {
+		if(eat){
+			int auxx = 0;
+			int auxy = 0;
+			if (direction == Direction.LEFT) {
+				auxx=body.getLast().getX()+1;
+				auxy=body.getLast().getY();
+			}
+			if (direction == Direction.RIGHT) {
+				auxx=body.getLast().getX()-1;
+				auxy=body.getLast().getY();
+			}
+			if (direction == Direction.UP) { 
+				auxx=body.getLast().getX();
+				auxy=body.getLast().getY()+1;
+			}
+			if (direction == Direction.DOWN) { 
+				auxx=body.getLast().getX();
+				auxy=body.getLast().getY()-1;
+			}
+			addEndOfTail(auxx, auxy);
+			new Cobra(auxx, auxy, 1, direction);
+		}
 	}
 
 	/**
@@ -101,6 +161,10 @@ class Cobra{
 			}
 		}	
 		return false;
+	}
+
+	private void addEndOfTail(int auxx, int auxy) {
+		body.add(new Position(auxx,auxy));
 	}
 
 	/**
@@ -160,70 +224,6 @@ class Cobra{
 			return;
 		eatAndGrow();
 		dontGoTheOppositeDirection(dir);
-	}
-
-	/**
-	 * Prevents the snake on colliding with itself when pressing an opposite direction of which the snake is going
-	 * @param dir
-	 */
-	private void dontGoTheOppositeDirection(Direction dir) {
-		if(oposite(dir)){
-			this.direction=dir;
-			try{
-				Thread.sleep(getDificulty());
-			}
-			catch(InterruptedException ie){
-				ie.printStackTrace();
-			}
-			for (int i = body.size() - 1; i > 0; i--) {
-				body.get(i).setX(body.get(i - 1).getX());
-				body.get(i).setY(body.get(i - 1).getY()); 
-			} 
-			if (direction == Direction.LEFT) {
-				body.get(0).setX(body.get(0).getX() - 1); 
-			}
-			if (direction == Direction.RIGHT) {
-				body.get(0).setX(body.get(0).getX() + 1); 
-			}
-			if (direction == Direction.UP) { 
-				body.get(0).setY(body.get(0).getY() - 1);
-			}
-			if (direction == Direction.DOWN) { 
-				body.get(0).setY(body.get(0).getY() + 1);
-			}
-		}
-	}
-
-	/**
-	 * Checks if the snake has eaten and makes it grow
-	 */
-	private void eatAndGrow() {
-		if(eat){
-			int auxx = 0;
-			int auxy = 0;
-			if (direction == Direction.LEFT) {
-				auxx=body.getLast().getX()+1;
-				auxy=body.getLast().getY();
-			}
-			if (direction == Direction.RIGHT) {
-				auxx=body.getLast().getX()-1;
-				auxy=body.getLast().getY();
-			}
-			if (direction == Direction.UP) { 
-				auxx=body.getLast().getX();
-				auxy=body.getLast().getY()+1;
-			}
-			if (direction == Direction.DOWN) { 
-				auxx=body.getLast().getX();
-				auxy=body.getLast().getY()-1;
-			}
-			addEndOfTail(auxx, auxy);
-			new Cobra(auxx, auxy, 1, direction);
-		}
-	}
-
-	private void addEndOfTail(int auxx, int auxy) {
-		body.add(new Position(auxx,auxy));
 	}
 
 	public int getDificulty() {
@@ -307,7 +307,9 @@ public class Snake
 				spikes=makeSpikes(new LinkedList<Position>(), snake);
 				border=makeBorders(snake, new LinkedList<Position>());
 			}
+			
 			printFoodSpikes(food, spikes);
+			//Loading Screen
 			if(pause)
 				loadingScreen(snake, food, border);
 			whichWay(snake, food,border);
@@ -323,37 +325,7 @@ public class Snake
 	}
 
 	/**
-	 * Selects the dificulty of the game
-	 * @param snake
-	 * @param y
-	 * @return
-	 */
-	private Cobra selectDificulty(Cobra snake, int y) {
-		gametimer=40;
-		if(y==13){
-			snake = newSnake();
-			snake.setDificulty(EASY);
-			started=true;
-			end=false;
-		}
-		if(y==15){
-			snake=newSnake();
-			snake.setDificulty(MEDIUM);
-			started=true;
-			end=false;
-		}
-		if(y==17){	
-			snake=newSnake();
-			snake.setDificulty(HARD);
-			started=true;
-			end=false;
-		}
-		score=0;
-		return snake;
-	}
-
-	/**
-	 * Change settings of the menu
+	 * Change settings of the terminal
 	 */
 	private void terminalSettings() {
 		term.applySGR(Terminal.SGR.ENTER_BOLD);
@@ -384,7 +356,280 @@ public class Snake
 	}
 
 	/**
-	 * Determines postion so that the string can be at the middle of the screen
+	 * Prints the waiting sign on top of the terminal and sets the start of the game
+	 * @param snake
+	 * @param food
+	 * @param border
+	 */
+	private void loadingScreen(Cobra snake, LinkedList<Position> food,
+			LinkedList<Position> border) {
+		term.clearScreen();
+		printFoodSpikes(food, spikes);
+		printBorders(border);
+		printSnake(snake);
+		String game="Game Starts in "+(gametimer/10);
+		String getready="Get Ready!";
+		if(gametimer>0 && gametimer<40){
+			show(game, calcPosition(game),0);
+		}
+		if(gametimer==40)
+			show(getready, calcPosition(getready), 0);
+		if(gametimer==0)
+			pause=false;
+		gametimer-=10;
+		try{
+			Thread.sleep(800);
+		}
+		catch (InterruptedException ie){
+			ie.printStackTrace();
+		}
+	}
+	/**
+	 * Prints borders
+	 * @param border
+	 */
+
+	private void printBorders(LinkedList<Position> border) {
+		for(Position p:border)
+			show("#",p.x,p.y);
+	}
+
+	/**
+	 * Print snake
+	 * @param snake
+	 */
+	private void printSnake(Cobra snake) {
+		for(Position pos:snake.body){
+			if(pos.equals(snake.body.get(0))){
+				show("@", pos.x, pos.y);
+			}
+			else
+				show("O", pos.x, pos.y);
+		}
+	
+	}
+
+	/**
+	 * Print Score
+	 * @param snake
+	 * @param food
+	 */
+	private void printScore(Cobra snake, LinkedList<Position> food) {
+		snake.eat=snake.hasEaten(food,snake);
+		if(snake.eat){
+			score+=100+bonus;
+			bonus=50;
+		}
+		String scorePlusBonus = "Score: "+Integer.toString(score)+"      Bonus: "+Integer.toString(bonus);
+		show(scorePlusBonus,calcPosition(scorePlusBonus),0);
+	}
+
+	/**
+	 * Prints all the obstacles/objectives on the board
+	 * @param food
+	 * @param spikes
+	 */
+	private void printFoodSpikes(LinkedList<Position> food,
+			LinkedList<Position> spikes) {
+		for(Position p:food){
+			show("Q",p.x,p.y);
+		}
+		for(Position p:spikes){
+			show("X",p.x,p.y);
+		}
+	}
+
+	/**
+	 * Prints the game over sign
+	 * @param y
+	 * @param x
+	 */
+	private void gameOverScreen(int y, int x) {
+		String scores="Your Score: "+Integer.toString(score);
+		String[] gameover={" ____    ____   _   _   ___  ",
+						   "|  __|  |  _ | | | | | |  _| ",
+						   "| | __  | |_|| |  |  | | |_  ",
+						   "| |_| | |  _ | |  _  | |  _| ",
+						   "|_____| |_| || |_| |_| |___| ",
+						   "                             ",
+						   " ____    _     _    ___   _____ ",
+						   "|  _ |  | |   | |  |  _| |  _  |",
+						   "| | ||  |  | |  |  | |_  | |_| |",
+						   "| |_||   |     |   |  _| |     /",
+						   "|____|    |___|    |___| |_| \\_\\"};
+		show(scores,calcPosition(scores),18);
+		for(int i=0;i<gameover.length;i++){
+			show(gameover[i],calcPosition(gameover[i]),5+i);
+		}
+		String trya="Try Again?";
+		show(trya,calcPosition(trya),20);
+		String menugo="Go to Main Menu";
+		show(menugo,calcPosition(menugo),22);
+		show("->",x,y);
+		try{
+			Thread.sleep(200);
+		}
+		catch (InterruptedException ie){
+			ie.printStackTrace();
+		}
+	}
+
+	/**
+	 * Makes borders depending on the dificulty of the game.
+	 * @param snake 
+	 * @return 
+	 */
+	private LinkedList<Position> makeBorders(Cobra snake,LinkedList<Position> border) {
+		Position aux=null;
+	
+		for(int i=2;i<MAX_X-2;i++){
+			for(int r=2;r<MAX_Y-2;r++){
+				if(i==2 || i==97){
+					aux= new Position(i, r);
+					border.add(aux);
+				}
+				if(r==2 || r==27){
+					aux= new Position(i, r);
+					border.add(aux);
+				}
+			}
+		}
+	
+		if(snake.getDificulty()==MEDIUM){
+			for(int i=2;i<MAX_X-2;i++){
+				for(int r=2;r<MAX_Y-2;r++){
+					if(i==2 || i==97){
+						aux= new Position(i, r);
+						border.add(aux);
+					}
+					if(r==2 || r==27){
+						aux= new Position(i, r);
+						border.add(aux);
+					}
+					if(i==MAX_X/2 && r>(MAX_Y/2)-5 && r<(MAX_Y/2)+5){
+						aux= new Position(i, r);
+						border.add(aux);						
+					}
+					if(r==MAX_Y/2 && i>(MAX_X/2)-25 && i<(MAX_X/2)+25){
+						aux= new Position(i, r);
+						border.add(aux);
+					}
+				}
+			}
+		}
+		if(snake.getDificulty()==HARD){
+			for(int i=2;i<MAX_X-2;i++){
+				for(int r=2;r<MAX_Y-2;r++){
+					if(i==2 || i==97){
+						aux= new Position(i, r);
+						border.add(aux);
+					}
+					if(r==2 || r==27){
+						aux= new Position(i, r);
+						border.add(aux);
+					}
+					if(i==MAX_X/2){
+						if(r>2 && r<(MAX_Y/2)-5){
+							aux= new Position(i, r);
+							border.add(aux);						
+						}
+						if(r>(MAX_Y/2)+5 && r<(MAX_Y-2)){
+							aux= new Position(i, r);
+							border.add(aux);	
+						}
+	
+					}
+	
+					if(r==MAX_Y/2){
+						if(i>2 && i<(MAX_X/2)-10){
+							aux= new Position(i, r);
+							border.add(aux);
+						}
+						if(i>(MAX_X/2)+10 && i<MAX_X-2){
+							aux= new Position(i, r);
+							border.add(aux);
+						}
+					}
+				}
+			}
+		}
+		return border;
+	}
+
+	/**
+	 * Makes food for the snake to eat
+	 * @param food
+	 * @return
+	 */
+	private LinkedList<Position> makeFood(LinkedList<Position> food, Cobra snake) {
+		Random r=new Random();
+		int size=0;
+		if(snake.getDificulty()==EASY){
+			size=15;
+		}
+		if(snake.getDificulty()==MEDIUM){
+			size=10;
+		}
+		if(snake.getDificulty()==HARD){
+			size=5;
+		}
+		food=produceFood(food, r, size);
+	
+		return food;
+	}
+
+	/**
+	 * Makes those nasty obstacles
+	 * @param spikes
+	 * @return
+	 */
+	private LinkedList<Position> makeSpikes(LinkedList<Position> spikes, Cobra snake) {
+		Random r=new Random();
+		int size=0;
+		if(snake.getDificulty()==EASY)
+			size=10;
+		if(snake.getDificulty()==MEDIUM)
+			size=20;
+		if(snake.getDificulty()==HARD)
+			size=35;
+		spikes=produceSpikes(spikes, r, size);
+		return spikes;
+	}
+
+	/**
+	 * Produces food on with the size, that depends on the dificulty
+	 * @param food
+	 * @param r
+	 * @param size
+	 * @return 
+	 */
+	private LinkedList<Position> produceFood(LinkedList<Position> food, Random r, int size) {
+		Position f;
+		for(int i=0;i<size;i++){
+			f=new Position(r.nextInt(90)+3, r.nextInt(20)+3);
+			food.add(f);
+		}
+		return food;
+	}
+
+	/**
+	 * Produces spikes on with the size, that depends on the dificulty 
+	 * @param spikes
+	 * @param r
+	 * @param size
+	 * @return 
+	 */
+	private LinkedList<Position> produceSpikes(LinkedList<Position> spikes, Random r, int size) {
+		Position f;
+		for(int i=0;i<size;i++){
+			f=new Position(r.nextInt(90)+3, r.nextInt(20)+3);
+			spikes.add(f);
+		}
+		return spikes;
+	}
+
+	/**
+	 * Determines position so that the string can be at the middle of the screen
 	 * @param easy2
 	 * @return
 	 */
@@ -392,6 +637,36 @@ public class Snake
 		int mid=0;
 		mid=(MAX_X-easy2.length())/2;
 		return mid;
+	}
+
+	/**
+	 * Selects the dificulty of the game
+	 * @param snake
+	 * @param y
+	 * @return
+	 */
+	private Cobra selectDificulty(Cobra snake, int y) {
+		gametimer=40;
+		if(y==13){
+			snake = newSnake();
+			snake.setDificulty(EASY);
+			started=true;
+			end=false;
+		}
+		if(y==15){
+			snake=newSnake();
+			snake.setDificulty(MEDIUM);
+			started=true;
+			end=false;
+		}
+		if(y==17){	
+			snake=newSnake();
+			snake.setDificulty(HARD);
+			started=true;
+			end=false;
+		}
+		score=0;
+		return snake;
 	}
 
 	/**
@@ -452,70 +727,6 @@ public class Snake
 	}
 
 	/**
-	 * @param snake
-	 * @param food
-	 * @param border
-	 */
-	private void loadingScreen(Cobra snake, LinkedList<Position> food,
-			LinkedList<Position> border) {
-		term.clearScreen();
-		printFoodSpikes(food, spikes);
-		printBorders(border);
-		printSnake(snake);
-		String game="Game Starts in "+(gametimer/10);
-		String getready="Get Ready!";
-		if(gametimer>0 && gametimer<40){
-			show(game, calcPosition(game),0);
-		}
-		if(gametimer==40)
-			show(getready, calcPosition(getready), 0);
-		if(gametimer==0)
-			pause=false;
-		gametimer-=10;
-		try{
-			Thread.sleep(800);
-		}
-		catch (InterruptedException ie){
-			ie.printStackTrace();
-		}
-	}
-
-	private void printBorders(LinkedList<Position> border) {
-		for(Position p:border)
-			show("#",p.x,p.y);
-	}
-
-	/**
-	 * Print snake
-	 * @param snake
-	 */
-	private void printSnake(Cobra snake) {
-		for(Position pos:snake.body){
-			if(pos.equals(snake.body.get(0))){
-				show("@", pos.x, pos.y);
-			}
-			else
-				show("O", pos.x, pos.y);
-		}
-
-	}
-
-	/**
-	 * Print Score to Terminal
-	 * @param snake
-	 * @param food
-	 */
-	private void printScore(Cobra snake, LinkedList<Position> food) {
-		snake.eat=snake.hasEaten(food,snake);
-		if(snake.eat){
-			score+=100+bonus;
-			bonus=50;
-		}
-		String scorePlusBonus = "Score: "+Integer.toString(score)+"      Bonus: "+Integer.toString(bonus);
-		show(scorePlusBonus,calcPosition(scorePlusBonus),0);
-	}
-
-	/**
 	 * Snake keeps moving on the direction of the last step
 	 * @param snake
 	 * @param food
@@ -527,88 +738,6 @@ public class Snake
 			printScore(snake, food);
 			printSnake(snake);
 		}
-	}
-
-	/**
-	 * Printing Borders
-	 * @param snake 
-	 * @return 
-	 */
-	private LinkedList<Position> makeBorders(Cobra snake,LinkedList<Position> border) {
-		Position aux=null;
-
-		for(int i=2;i<MAX_X-2;i++){
-			for(int r=2;r<MAX_Y-2;r++){
-				if(i==2 || i==97){
-					aux= new Position(i, r);
-					border.add(aux);
-				}
-				if(r==2 || r==27){
-					aux= new Position(i, r);
-					border.add(aux);
-				}
-			}
-		}
-
-		if(snake.getDificulty()==MEDIUM){
-			for(int i=2;i<MAX_X-2;i++){
-				for(int r=2;r<MAX_Y-2;r++){
-					if(i==2 || i==97){
-						aux= new Position(i, r);
-						border.add(aux);
-					}
-					if(r==2 || r==27){
-						aux= new Position(i, r);
-						border.add(aux);
-					}
-					if(i==MAX_X/2 && r>(MAX_Y/2)-5 && r<(MAX_Y/2)+5){
-						aux= new Position(i, r);
-						border.add(aux);						
-					}
-					if(r==MAX_Y/2 && i>(MAX_X/2)-25 && i<(MAX_X/2)+25){
-						aux= new Position(i, r);
-						border.add(aux);
-					}
-				}
-			}
-		}
-		if(snake.getDificulty()==HARD){
-			for(int i=2;i<MAX_X-2;i++){
-				for(int r=2;r<MAX_Y-2;r++){
-					if(i==2 || i==97){
-						aux= new Position(i, r);
-						border.add(aux);
-					}
-					if(r==2 || r==27){
-						aux= new Position(i, r);
-						border.add(aux);
-					}
-					if(i==MAX_X/2){
-						if(r>2 && r<(MAX_Y/2)-5){
-							aux= new Position(i, r);
-							border.add(aux);						
-						}
-						if(r>(MAX_Y/2)+5 && r<(MAX_Y-2)){
-							aux= new Position(i, r);
-							border.add(aux);	
-						}
-
-					}
-
-					if(r==MAX_Y/2){
-						if(i>2 && i<(MAX_X/2)-10){
-							aux= new Position(i, r);
-							border.add(aux);
-						}
-						if(i>(MAX_X/2)+10 && i<MAX_X-2){
-							aux= new Position(i, r);
-							border.add(aux);
-						}
-					}
-				}
-			}
-		}
-		return border;
 	}
 
 	/**
@@ -717,41 +846,6 @@ public class Snake
 	}
 
 	/**
-	 * Prints the game over sign
-	 * @param y
-	 * @param x
-	 */
-	private void gameOverScreen(int y, int x) {
-		String scores="Your Score: "+Integer.toString(score);
-		String[] gameover={" ____    ____   _   _   ___  ",
-				"|  __|  |  _ | | | | | |  _| ",
-				"| | __  | |_|| |  |  | | |_  ",
-				"| |_| | |  _ | |  _  | |  _| ",
-				"|_____| |_| || |_| |_| |___| ",
-				"                             ",
-				" ____    _     _    ___   _____ ",
-				"|  _ |  | |   | |  |  _| |  _  |",
-				"| | ||  |  | |  |  | |_  | |_| |",
-				"| |_||   |     |   |  _| |     /",
-		"|____|    |___|    |___| |_| \\_\\"};
-		show(scores,calcPosition(scores),18);
-		for(int i=0;i<gameover.length;i++){
-			show(gameover[i],calcPosition(gameover[i]),5+i);
-		}
-		String trya="Try Again?";
-		show(trya,calcPosition(trya),20);
-		String menugo="Go to Main Menu";
-		show(menugo,calcPosition(menugo),22);
-		show("->",x,y);
-		try{
-			Thread.sleep(200);
-		}
-		catch (InterruptedException ie){
-			ie.printStackTrace();
-		}
-	}
-
-	/**
 	 * Check which of the selections on the game over screen has been selected
 	 * @param snake
 	 * @param dificulty
@@ -779,91 +873,6 @@ public class Snake
 		return snake;
 	}
 
-
-	/**
-	 * Prints all the obstacles/objectives on the board
-	 * @param food
-	 * @param spikes
-	 */
-	private void printFoodSpikes(LinkedList<Position> food,
-			LinkedList<Position> spikes) {
-		for(Position p:food){
-			show("Q",p.x,p.y);
-		}
-		for(Position p:spikes){
-			show("X",p.x,p.y);
-		}
-	}
-
-	/**
-	 * Makes food for the snake to eat
-	 * @param food
-	 * @return
-	 */
-	private LinkedList<Position> makeFood(LinkedList<Position> food, Cobra snake) {
-		Random r=new Random();
-		int size=0;
-		if(snake.getDificulty()==EASY){
-			size=15;
-		}
-		if(snake.getDificulty()==MEDIUM){
-			size=10;
-		}
-		if(snake.getDificulty()==HARD){
-			size=5;
-		}
-		food=produceFood(food, r, size);
-
-		return food;
-	}
-
-	/**
-	 * @param food
-	 * @param r
-	 * @param size
-	 * @return 
-	 */
-	private LinkedList<Position> produceFood(LinkedList<Position> food, Random r, int size) {
-		Position f;
-		for(int i=0;i<size;i++){
-			f=new Position(r.nextInt(90)+3, r.nextInt(20)+3);
-			food.add(f);
-		}
-		return food;
-	}
-
-	/**
-	 * Makes those nasty obstacles
-	 * @param spikes
-	 * @return
-	 */
-	private LinkedList<Position> makeSpikes(LinkedList<Position> spikes, Cobra snake) {
-		Random r=new Random();
-		int size=0;
-		if(snake.getDificulty()==EASY)
-			size=10;
-		if(snake.getDificulty()==MEDIUM)
-			size=20;
-		if(snake.getDificulty()==HARD)
-			size=35;
-		spikes=produceSpikes(spikes, r, size);
-		return spikes;
-	}
-
-	/**
-	 * @param spikes
-	 * @param r
-	 * @param size
-	 * @return 
-	 */
-	private LinkedList<Position> produceSpikes(LinkedList<Position> spikes, Random r, int size) {
-		Position f;
-		for(int i=0;i<size;i++){
-			f=new Position(r.nextInt(90)+3, r.nextInt(20)+3);
-			spikes.add(f);
-		}
-		return spikes;
-	}
 
 	/**
 	 * Gets every character on the terminal
