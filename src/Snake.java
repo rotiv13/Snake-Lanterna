@@ -61,6 +61,7 @@ class Cobra{
 			}
 		}
 	}
+	//SNAKE CONTROL   ------------------------------------------------------------
 
 	/**
 	 * Checks if the direction you provided is opposite to the direction of the snake
@@ -194,7 +195,7 @@ class Cobra{
 		}
 		return false;
 	}
-
+	//END OF SNAKE CONTROL ----------------------------------------------------------
 	public Direction getDirection() {
 		return direction;
 	}
@@ -307,7 +308,7 @@ public class Snake
 				spikes=makeSpikes(new LinkedList<Position>(), snake);
 				border=makeBorders(snake, new LinkedList<Position>());
 			}
-			
+
 			printFoodSpikes(food, spikes);
 			//Loading Screen
 			if(pause)
@@ -323,6 +324,8 @@ public class Snake
 				break;
 		}
 	}
+	
+	//VISUALIZATION ---------------------------------------------------------------
 
 	/**
 	 * Change settings of the terminal
@@ -406,7 +409,7 @@ public class Snake
 			else
 				show("O", pos.x, pos.y);
 		}
-	
+
 	}
 
 	/**
@@ -447,16 +450,16 @@ public class Snake
 	private void gameOverScreen(int y, int x) {
 		String scores="Your Score: "+Integer.toString(score);
 		String[] gameover={" ____    ____   _   _   ___  ",
-						   "|  __|  |  _ | | | | | |  _| ",
-						   "| | __  | |_|| |  |  | | |_  ",
-						   "| |_| | |  _ | |  _  | |  _| ",
-						   "|_____| |_| || |_| |_| |___| ",
-						   "                             ",
-						   " ____    _     _    ___   _____ ",
-						   "|  _ |  | |   | |  |  _| |  _  |",
-						   "| | ||  |  | |  |  | |_  | |_| |",
-						   "| |_||   |     |   |  _| |     /",
-						   "|____|    |___|    |___| |_| \\_\\"};
+				"|  __|  |  _ | | | | | |  _| ",
+				"| | __  | |_|| |  |  | | |_  ",
+				"| |_| | |  _ | |  _  | |  _| ",
+				"|_____| |_| || |_| |_| |___| ",
+				"                             ",
+				" ____    _     _    ___   _____ ",
+				"|  _ |  | |   | |  |  _| |  _  |",
+				"| | ||  |  | |  |  | |_  | |_| |",
+				"| |_||   |     |   |  _| |     /",
+		"|____|    |___|    |___| |_| \\_\\"};
 		show(scores,calcPosition(scores),18);
 		for(int i=0;i<gameover.length;i++){
 			show(gameover[i],calcPosition(gameover[i]),5+i);
@@ -475,13 +478,57 @@ public class Snake
 	}
 
 	/**
+	 * Check which of the selections on the game over screen has been selected
+	 * @param snake
+	 * @param dificulty
+	 * @param y
+	 * @return
+	 */
+	private Cobra gameOverRestart(Cobra snake, int dificulty, int y) {
+		if(y==20){
+			started=true;
+			snake=newSnake();
+			snake.setDificulty(dificulty);
+			gametimer=40;
+			pause=true;
+			snake.crashed=false;
+			end=false;
+	
+			score=0;
+		}
+		if(y==22){
+			started=false;
+			pause=true;
+			snake.crashed=false;
+			end=false;
+		}
+		return snake;
+	}
+
+	/**
+	 * Gets every character on the terminal
+	 * @param str
+	 * @param x
+	 * @param y
+	 */
+	private void show(String str, int x, int y){
+		term.moveCursor(x, y);
+		int len = str.length();
+		for (int i = 0; i < len; i++){
+			term.putCharacter(str.charAt(i));
+		}
+	}
+
+	//END OF VISUALIZATION -----------------------------------------------------------
+	 	
+	/**
 	 * Makes borders depending on the dificulty of the game.
 	 * @param snake 
 	 * @return 
 	 */
 	private LinkedList<Position> makeBorders(Cobra snake,LinkedList<Position> border) {
 		Position aux=null;
-	
+
 		for(int i=2;i<MAX_X-2;i++){
 			for(int r=2;r<MAX_Y-2;r++){
 				if(i==2 || i==97){
@@ -494,7 +541,7 @@ public class Snake
 				}
 			}
 		}
-	
+
 		if(snake.getDificulty()==MEDIUM){
 			for(int i=2;i<MAX_X-2;i++){
 				for(int r=2;r<MAX_Y-2;r++){
@@ -537,9 +584,9 @@ public class Snake
 							aux= new Position(i, r);
 							border.add(aux);	
 						}
-	
+
 					}
-	
+
 					if(r==MAX_Y/2){
 						if(i>2 && i<(MAX_X/2)-10){
 							aux= new Position(i, r);
@@ -574,7 +621,7 @@ public class Snake
 			size=5;
 		}
 		food=produceFood(food, r, size);
-	
+
 		return food;
 	}
 
@@ -639,6 +686,10 @@ public class Snake
 		return mid;
 	}
 
+	//END OF VISUALIZATION -----------------------------------------------------------
+	
+	
+	//SNAKE CONTROL
 	/**
 	 * Selects the dificulty of the game
 	 * @param snake
@@ -798,6 +849,7 @@ public class Snake
 		}
 	}
 
+	//END OF SNAKE CONTROL
 
 	/**
 	 * Game Over
@@ -843,49 +895,6 @@ public class Snake
 			gameOverScreen(y, x);
 		}
 		return snake;
-	}
-
-	/**
-	 * Check which of the selections on the game over screen has been selected
-	 * @param snake
-	 * @param dificulty
-	 * @param y
-	 * @return
-	 */
-	private Cobra gameOverRestart(Cobra snake, int dificulty, int y) {
-		if(y==20){
-			started=true;
-			snake=newSnake();
-			snake.setDificulty(dificulty);
-			gametimer=40;
-			pause=true;
-			snake.crashed=false;
-			end=false;
-			
-			score=0;
-		}
-		if(y==22){
-			started=false;
-			pause=true;
-			snake.crashed=false;
-			end=false;
-		}
-		return snake;
-	}
-
-
-	/**
-	 * Gets every character on the terminal
-	 * @param str
-	 * @param x
-	 * @param y
-	 */
-	private void show(String str, int x, int y){
-		term.moveCursor(x, y);
-		int len = str.length();
-		for (int i = 0; i < len; i++){
-			term.putCharacter(str.charAt(i));
-		}
 	}
 
 	public static void main(String[] args){
