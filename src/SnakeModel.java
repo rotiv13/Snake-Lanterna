@@ -2,13 +2,18 @@ import java.util.LinkedList;
 import java.util.Random;
 
 class SnakeModel{
-	LinkedList<Position> body =new LinkedList<Position>();
-	Random rand=new Random();
+	LinkedList<Position> body = new LinkedList<Position>();
+	Random rand = new Random();
 	Direction direction;
 	Position position;
-	boolean crashed=false;
-	boolean eat=false;
-	private int dificulty=300;
+	boolean crashed = false;
+	boolean eat = false;
+	private int dificulty = 300;
+	private static final int HARD = 70;
+	private static final int MEDIUM = 120;
+	private static final int EASY = 170;
+	LinkedList<Position> food = new LinkedList<Position>();
+	LinkedList<Position> spikes = new LinkedList<Position>();
 	SnakeModel(int x,int y,int length, Direction dir){
 		if(oposite(dir)){
 			setDirection(dir);
@@ -59,7 +64,7 @@ class SnakeModel{
 	private void dontGoTheOppositeDirection(Direction dir) {
 		if(oposite(dir)){
 			this.direction=dir;
-			
+
 			for (int i = body.size() - 1; i > 0; i--) {
 				body.get(i).setX(body.get(i - 1).getX());
 				body.get(i).setY(body.get(i - 1).getY()); 
@@ -77,14 +82,94 @@ class SnakeModel{
 				body.get(0).setY(body.get(0).getY() + 1);
 			}
 		}
-		
+
 	}
-	
+
 	public boolean equals(Position pos){
 		if(body.get(0).x==pos.x && body.get(0).y==pos.y)
 			return true;
 		return false;
 
+	}
+	/**
+	 * Makes all the targets/obstacles for the game
+	 */
+	public void produceObstaclesTargets() {
+		// TODO Auto-generated method stub
+		food=new LinkedList<Position>();
+		spikes=new LinkedList<Position>();
+		makeFood();
+		makeSpikes();
+	}
+
+	/**
+	 * Makes food for the snake to eat
+	 * @param food
+	 * @return
+	 */
+	private void makeFood() {
+		Random r=new Random();
+
+		int size=0;
+		if(getDificulty()==EASY){
+			size=15;
+		}
+		if(getDificulty()==MEDIUM){
+			size=10;
+		}
+		if(getDificulty()==HARD){
+			size=5;
+		}
+		produceFood(r, size);
+
+
+	}
+
+	/**
+	 * Makes those nasty obstacles
+	 * @param spikes
+	 * @return
+	 */
+	private void makeSpikes() {
+		Random r=new Random();
+		int size=0;
+		if(getDificulty()==EASY)
+			size=10;
+		if(getDificulty()==MEDIUM)
+			size=20;
+		if(getDificulty()==HARD)
+			size=35;
+		produceSpikes( r, size);
+	}
+
+	/**
+	 * Produces food on with the size, that depends on the dificulty
+	 * @param food
+	 * @param r
+	 * @param size
+	 * @return 
+	 */
+	private void produceFood( Random r, int size) {
+		Position f;
+		for(int i=0;i<size;i++){
+			f=new Position(r.nextInt(90)+3, r.nextInt(20)+3);
+			food.add(f);
+		}
+	}
+
+	/**
+	 * Produces spikes on with the size, that depends on the dificulty 
+	 * @param spikes
+	 * @param r
+	 * @param size
+	 * @return 
+	 */
+	private void produceSpikes( Random r, int size) {
+		Position f;
+		for(int i=0;i<size;i++){
+			f=new Position(r.nextInt(90)+3, r.nextInt(20)+3);
+			spikes.add(f);
+		}
 	}
 
 	/**
@@ -115,32 +200,30 @@ class SnakeModel{
 		}
 	}
 
-	/**
-	 * Checks if the snake has eaten a fruit
-	 * @param comida
-	 * @param snake 
-	 * @return
-	 */
-	public boolean hasEaten(LinkedList<Position> comida, SnakeModel snake){
-		for(int i=0;i<comida.size();i++){
-			if(equals(comida.get(i))){
-				comida.set(i,new Position(rand.nextInt(90)+4, rand.nextInt(20)+4));
-				return true;
-			}
-		}	
-		return false;
-	}
 
 	private void addEndOfTail(int auxx, int auxy) {
 		body.add(new Position(auxx,auxy));
 	}
 
 	/**
-	 * Checks if the snake has collided with a spike
-	 * @param spikes
+	 * Checks if the snake has eaten a fruit
 	 * @return
 	 */
-	public boolean gotSpikes(LinkedList<Position> spikes){
+	public boolean hasEaten(){
+		for(int i=0;i<food.size();i++){
+			if(equals(food.get(i))){
+				food.set(i,new Position(rand.nextInt(90)+4, rand.nextInt(20)+4));
+				return true;
+			}
+		}	
+		return false;
+	}
+
+	/**
+	 * Checks if the snake has collided with a spike
+	 * @return
+	 */
+	public boolean gotSpikes(){
 		for(int i=0;i<spikes.size();i++){
 			if(equals(spikes.get(i))){
 				return true;
@@ -151,12 +234,11 @@ class SnakeModel{
 
 	/**
 	 * Check if it collided with itself
-	 * @param snake
 	 * @return
 	 */
-	public boolean hitMe(SnakeModel snake){
-		for(int i=2;i<snake.body.size();i++){
-			if(snake.equals(snake.body.get(i))){
+	public boolean hitMe(){
+		for(int i=2;i<body.size();i++){
+			if(equals(body.get(i))){
 				return true;
 			}
 		}
@@ -190,7 +272,7 @@ class SnakeModel{
 	public void makeStep(Direction dir){
 		eatAndGrow();
 		dontGoTheOppositeDirection(dir);
-		
+
 	}
 
 	public int getDificulty() {
@@ -199,5 +281,6 @@ class SnakeModel{
 
 	public void setDificulty(int dificulty) {
 		this.dificulty = dificulty;
+		produceObstaclesTargets();
 	}
 }
