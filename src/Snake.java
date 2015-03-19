@@ -27,9 +27,8 @@ public class Snake
 	private int randy=0;
 	private int score=0;
 	private int bonus=50;
-	LinkedList<Position> food;
 	LinkedList<Position> border;
-	LinkedList<Position> spikes;
+	SnakeModel snake;
 	public Snake(){
 		term = TerminalFacade.createTerminal();
 		term.enterPrivateMode();
@@ -37,9 +36,8 @@ public class Snake
 		MAX_Y=term.getTerminalSize().getRows();
 		randy=rand.nextInt(MAX_Y-10)+3;
 		randx=rand.nextInt(MAX_X-10)+5;
-		SnakeModel snake=newSnake();
-		food = new LinkedList<Position>();
-		spikes = new LinkedList<Position>();
+		snake=newSnake();
+		
 		border = new LinkedList<Position>();
 		while (true){
 			terminalSettings();
@@ -73,12 +71,11 @@ public class Snake
 					printWelcomeMenu(y);
 				}
 
-				food=makeFood(new LinkedList<Position>(), snake);
-				spikes=makeSpikes(new LinkedList<Position>(), snake);
+				
 				border=makeBorders(snake, new LinkedList<Position>());
 			}
 
-			printFoodSpikes(food, spikes);
+			printFoodSpikes(snake);
 			//Loading Screen
 			if(pause)
 				loadingScreen(snake);
@@ -87,7 +84,7 @@ public class Snake
 
 
 			if(snake.crashed){
-				snake=gameOver(snake);
+				snake=gameOver();
 			}
 			if (end)
 				break;
@@ -133,7 +130,7 @@ public class Snake
 	 */
 	private void loadingScreen(SnakeModel snake) {
 		term.clearScreen();
-		printFoodSpikes(food, spikes);
+		printFoodSpikes(snake);
 		printBorders(border);
 		printSnake(snake);
 		String game="Game Starts in "+(gametimer/10);
@@ -184,8 +181,8 @@ public class Snake
 	 * @param snake
 	 * @param food
 	 */
-	private void printScore(SnakeModel snake, LinkedList<Position> food) {
-		snake.eat=snake.hasEaten(food,snake);
+	private void printScore(SnakeModel snake) {
+		snake.eat=snake.hasEaten();
 		if(snake.eat){
 			score+=100+bonus;
 			bonus=50;
@@ -199,14 +196,60 @@ public class Snake
 	 * @param food
 	 * @param spikes
 	 */
-	private void printFoodSpikes(LinkedList<Position> food,
-			LinkedList<Position> spikes) {
-		for(Position p:food){
+	private void printFoodSpikes(SnakeModel snake) {
+		for(Position p:snake.food){
 			show("Q",p.x,p.y);
 		}
-		for(Position p:spikes){
+		for(Position p:snake.spikes){
 			show("X",p.x,p.y);
 		}
+	}
+
+	//END OF SNAKE CONTROL
+	
+	/**
+	 * Game Over
+	 * @param snake
+	 * @param food
+	 * @param spikes
+	 * @return
+	 */
+	private SnakeModel gameOver() {
+		int dificulty=snake.getDificulty();
+		int y=20;
+		int x=40;
+		while(end){
+			term.clearScreen();
+			Key j=term.readInput();
+			if(j!=null){
+				switch (j.getKind()) {
+				case Escape:
+					term.exitPrivateMode();
+					end=true;
+					return null;
+				case Enter:
+					snake = gameOverRestart(dificulty, y);
+					snake.produceObstaclesTargets();
+					break;
+				case ArrowDown:
+					if(y>=20 && y<22){
+						x=37;
+						y+=2;
+					}
+					break;
+				case ArrowUp:
+					if( y>20 && y<=22){
+						x=40;
+						y-=2;
+					}
+					break;
+				default:
+					break;					
+				}
+			}
+			gameOverScreen(y, x);
+		}
+		return snake;
 	}
 
 	/**
@@ -231,8 +274,8 @@ public class Snake
 		for(int i=0;i<gameover.length;i++){
 			show(gameover[i],calcPosition(gameover[i]),5+i);
 		}
-		String trya="Try Again?";
-		show(trya,calcPosition(trya),20);
+		String tryagain="Try Again?";
+		show(tryagain,calcPosition(tryagain),20);
 		String menugo="Go to Main Menu";
 		show(menugo,calcPosition(menugo),22);
 		show("->",x,y);
@@ -251,11 +294,12 @@ public class Snake
 	 * @param y
 	 * @return
 	 */
-	private SnakeModel gameOverRestart(SnakeModel snake, int dificulty, int y) {
+	private SnakeModel gameOverRestart(int dificulty, int y) {
 		if(y==20){
 			started=true;
 			snake=newSnake();
 			snake.setDificulty(dificulty);
+			
 			gametimer=40;
 			pause=true;
 			snake.crashed=false;
@@ -353,77 +397,7 @@ public class Snake
 		return border;
 	}
 
-	/**
-	 * Makes food for the snake to eat
-	 * @param food
-	 * @return
-	 */
-	private LinkedList<Position> makeFood(LinkedList<Position> food, SnakeModel snake) {
-		Random r=new Random();
-		int size=0;
-		if(snake.getDificulty()==EASY){
-			size=15;
-		}
-		if(snake.getDificulty()==MEDIUM){
-			size=10;
-		}
-		if(snake.getDificulty()==HARD){
-			size=5;
-		}
-		food=produceFood(food, r, size);
-
-		return food;
-	}
-
-	/**
-	 * Makes those nasty obstacles
-	 * @param spikes
-	 * @return
-	 */
-	private LinkedList<Position> makeSpikes(LinkedList<Position> spikes, SnakeModel snake) {
-		Random r=new Random();
-		int size=0;
-		if(snake.getDificulty()==EASY)
-			size=10;
-		if(snake.getDificulty()==MEDIUM)
-			size=20;
-		if(snake.getDificulty()==HARD)
-			size=35;
-		spikes=produceSpikes(spikes, r, size);
-		return spikes;
-	}
-
-	/**
-	 * Produces food on with the size, that depends on the dificulty
-	 * @param food
-	 * @param r
-	 * @param size
-	 * @return 
-	 */
-	private LinkedList<Position> produceFood(LinkedList<Position> food, Random r, int size) {
-		Position f;
-		for(int i=0;i<size;i++){
-			f=new Position(r.nextInt(90)+3, r.nextInt(20)+3);
-			food.add(f);
-		}
-		return food;
-	}
-
-	/**
-	 * Produces spikes on with the size, that depends on the dificulty 
-	 * @param spikes
-	 * @param r
-	 * @param size
-	 * @return 
-	 */
-	private LinkedList<Position> produceSpikes(LinkedList<Position> spikes, Random r, int size) {
-		Position f;
-		for(int i=0;i<size;i++){
-			f=new Position(r.nextInt(90)+3, r.nextInt(20)+3);
-			spikes.add(f);
-		}
-		return spikes;
-	}
+	
 
 	/**
 	 * Determines position so that the string can be at the middle of the screen
@@ -466,6 +440,7 @@ public class Snake
 			started=true;
 			end=false;
 		}
+		
 		score=0;
 		return snake;
 	}
@@ -516,7 +491,7 @@ public class Snake
 			}
 			else{
 				if(!pause)
-					keepGoing(snake, food);
+					keepGoing(snake);
 			}
 			
 		}
@@ -528,7 +503,7 @@ public class Snake
 		}
 		term.clearScreen();
 		
-		printScore(snake, food);
+		printScore(snake);
 		printSnake(snake);
 		if(bonus<=0)
 			bonus=0;
@@ -543,7 +518,7 @@ public class Snake
 	 * @param snake
 	 * @param food
 	 */
-	private void keepGoing(SnakeModel snake, LinkedList<Position> food) {
+	private void keepGoing(SnakeModel snake) {
 		if(started){
 			snake.makestep();
 			
@@ -556,8 +531,7 @@ public class Snake
 	 * @param spikes
 	 */
 	private void checkCrashed(SnakeModel snake) {
-		boolean colided=snake.hitMe(snake);
-		if(snake.gotSpikes(spikes) || colided || outOfBounds(snake, border)){
+		if(snake.gotSpikes() || snake.hitMe() || outOfBounds(border)){
 			snake.crashed=true;
 			end=true;
 		}
@@ -570,6 +544,7 @@ public class Snake
 	private SnakeModel newSnake() {
 		SnakeModel snake;
 		snake=new SnakeModel(rand.nextInt(MAX_X-20)+10, rand.nextInt(MAX_Y-10)+5, 5, getRandomDirection());
+		snake.produceObstaclesTargets();
 		return snake;
 	}
 
@@ -599,61 +574,13 @@ public class Snake
 	 * Check if the snake is out of the arena
 	 * @param snake
 	 */
-	private boolean outOfBounds(SnakeModel snake, LinkedList<Position> border) {
+	private boolean outOfBounds(LinkedList<Position> border) {
 		for(int i=0;i<border.size();i++){
-			if(snake.equals(border.get(i))){
+			if(equals(border.get(i))){
 				return true;
 			}
 		}
 		return false;
-	}
-
-	//END OF SNAKE CONTROL
-
-	/**
-	 * Game Over
-	 * @param snake
-	 * @param food
-	 * @param spikes
-	 * @return
-	 */
-	private SnakeModel gameOver(SnakeModel snake) {
-		int dificulty=snake.getDificulty();
-		int y=20;
-		int x=40;
-		while(end){
-			term.clearScreen();
-			Key j=term.readInput();
-			if(j!=null){
-				switch (j.getKind()) {
-				case Escape:
-					term.exitPrivateMode();
-					end=true;
-					return null;
-				case Enter:
-					snake = gameOverRestart(snake, dificulty, y);
-					this.food=makeFood(new LinkedList<Position>(), snake);
-					this.spikes=makeSpikes(new LinkedList<Position>(), snake);
-					break;
-				case ArrowDown:
-					if(y>=20 && y<22){
-						x=38;
-						y+=2;
-					}
-					break;
-				case ArrowUp:
-					if( y>20 && y<=22){
-						x=40;
-						y-=2;
-					}
-					break;
-				default:
-					break;					
-				}
-			}
-			gameOverScreen(y, x);
-		}
-		return snake;
 	}
 
 	public static void main(String[] args){
