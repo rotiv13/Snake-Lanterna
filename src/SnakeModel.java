@@ -1,7 +1,7 @@
 import java.util.LinkedList;
 import java.util.Random;
 
-class Cobra{
+class SnakeModel{
 	LinkedList<Position> body =new LinkedList<Position>();
 	Random rand=new Random();
 	Direction direction;
@@ -9,7 +9,7 @@ class Cobra{
 	boolean crashed=false;
 	boolean eat=false;
 	private int dificulty=300;
-	Cobra(int x,int y,int length, Direction dir){
+	SnakeModel(int x,int y,int length, Direction dir){
 		if(oposite(dir)){
 			setDirection(dir);
 			for (int i = 0; i < length; i++) {
@@ -59,12 +59,7 @@ class Cobra{
 	private void dontGoTheOppositeDirection(Direction dir) {
 		if(oposite(dir)){
 			this.direction=dir;
-			try{
-				Thread.sleep(getDificulty());
-			}
-			catch(InterruptedException ie){
-				ie.printStackTrace();
-			}
+			
 			for (int i = body.size() - 1; i > 0; i--) {
 				body.get(i).setX(body.get(i - 1).getX());
 				body.get(i).setY(body.get(i - 1).getY()); 
@@ -82,8 +77,9 @@ class Cobra{
 				body.get(0).setY(body.get(0).getY() + 1);
 			}
 		}
+		
 	}
-
+	
 	public boolean equals(Position pos){
 		if(body.get(0).x==pos.x && body.get(0).y==pos.y)
 			return true;
@@ -115,7 +111,7 @@ class Cobra{
 				auxy=body.getLast().getY()-1;
 			}
 			addEndOfTail(auxx, auxy);
-			new Cobra(auxx, auxy, 1, direction);
+			new SnakeModel(auxx, auxy, 1, direction);
 		}
 	}
 
@@ -125,7 +121,7 @@ class Cobra{
 	 * @param snake 
 	 * @return
 	 */
-	public boolean hasEaten(LinkedList<Position> comida, Cobra snake){
+	public boolean hasEaten(LinkedList<Position> comida, SnakeModel snake){
 		for(int i=0;i<comida.size();i++){
 			if(equals(comida.get(i))){
 				comida.set(i,new Position(rand.nextInt(90)+4, rand.nextInt(20)+4));
@@ -158,7 +154,7 @@ class Cobra{
 	 * @param snake
 	 * @return
 	 */
-	public boolean hitMe(Cobra snake){
+	public boolean hitMe(SnakeModel snake){
 		for(int i=2;i<snake.body.size();i++){
 			if(snake.equals(snake.body.get(i))){
 				return true;
@@ -192,10 +188,9 @@ class Cobra{
 	 * @param dir
 	 */
 	public void makeStep(Direction dir){
-		if(crashed)
-			return;
 		eatAndGrow();
 		dontGoTheOppositeDirection(dir);
+		
 	}
 
 	public int getDificulty() {
