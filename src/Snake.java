@@ -576,7 +576,7 @@ public class Snake
 	 */
 	private boolean outOfBounds(SnakeModel snake,LinkedList<Position> border) {
 		for(int i=0;i<border.size();i++){
-			if(snake.equals(border.get(i))){
+			if(equals(border.get(i))){
 				return true;
 			}
 		}
