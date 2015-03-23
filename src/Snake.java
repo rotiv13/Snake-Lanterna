@@ -54,7 +54,7 @@ public class Snake
 							term.exitPrivateMode();
 							return;
 						case Enter:
-							snake = selectDificulty(snake, y);
+							snake = selectDificulty(y);
 							break;
 						case ArrowDown:
 							if(y>=13 && y<17)
@@ -420,7 +420,7 @@ public class Snake
 	 * @param y
 	 * @return
 	 */
-	private SnakeModel selectDificulty(SnakeModel snake, int y) {
+	private SnakeModel selectDificulty(int y) {
 		gametimer=40;
 		if(y==13){
 			snake = newSnake();
@@ -576,7 +576,7 @@ public class Snake
 	 */
 	private boolean outOfBounds(SnakeModel snake,LinkedList<Position> border) {
 		for(int i=0;i<border.size();i++){
-			if(equals(border.get(i))){
+			if(snake.equals(border.get(i))){
 				return true;
 			}
 		}
