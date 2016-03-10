@@ -3,6 +3,7 @@ import java.util.Random;
 
 import com.googlecode.lanterna.*;
 import com.googlecode.lanterna.terminal.*;
+import com.googlecode.lanterna.terminal.Terminal.Color;
 import com.googlecode.lanterna.input.*;
 
 /**
@@ -15,7 +16,6 @@ public class Snake
 	private static final int MEDIUM = 120;
 	private static final int EASY = 170;
 	private Terminal term;
-	private int length =1;
 	Random rand=new Random();
 	private int MAX_Y;
 	private int MAX_X;
@@ -37,7 +37,7 @@ public class Snake
 		randy=rand.nextInt(MAX_Y-10)+3;
 		randx=rand.nextInt(MAX_X-10)+5;
 		snake=newSnake();
-		
+
 		border = new LinkedList<Position>();
 		while (true){
 			terminalSettings();
@@ -71,18 +71,20 @@ public class Snake
 					printWelcomeMenu(y);
 				}
 
-				
-				border=makeBorders(snake, new LinkedList<Position>());
-			}
 
-			printFoodSpikes(snake);
+				border=makeBorders(new LinkedList<Position>());
+			}
+			term.clearScreen();
+			printFoodSpikes();
+			printBorders();
 			//Loading Screen
 			if(pause)
-				loadingScreen(snake);
-			whichWay(snake);
-			checkCrashed(snake);
+				loadingScreen();
 
-
+			printScore();
+			printSnake();
+			whichWay();
+			checkCrashed();
 			if(snake.crashed){
 				snake=gameOver();
 			}
@@ -90,7 +92,7 @@ public class Snake
 				break;
 		}
 	}
-	
+
 	//VISUALIZATION ---------------------------------------------------------------
 
 	/**
@@ -99,6 +101,7 @@ public class Snake
 	private void terminalSettings() {
 		term.applySGR(Terminal.SGR.ENTER_BOLD);
 		term.applyForegroundColor(Terminal.Color.GREEN);
+		term.applyBackgroundColor(Color.BLACK);
 		term.setCursorVisible(false);
 	}
 
@@ -128,11 +131,11 @@ public class Snake
 	 * Prints the waiting sign on top of the terminal and sets the start of the game
 	 * @param snake
 	 */
-	private void loadingScreen(SnakeModel snake) {
+	private void loadingScreen() {
 		term.clearScreen();
-		printFoodSpikes(snake);
-		printBorders(border);
-		printSnake(snake);
+		printFoodSpikes();
+		printBorders();
+		printSnake();
 		String game="Game Starts in "+(gametimer/10);
 		String getready="Get Ready!";
 		if(gametimer>0 && gametimer<40){
@@ -153,27 +156,30 @@ public class Snake
 	}
 	/**
 	 * Prints borders
-	 * @param border
 	 */
 
-	private void printBorders(LinkedList<Position> border) {
+	private void printBorders() {
+		term.applyBackgroundColor(Color.RED);
 		for(Position p:border)
-			show("#",p.x,p.y);
+			show(" ",p.x,p.y);
+		terminalSettings();
 	}
 
 	/**
 	 * Print snake
+	 * @param i 
 	 * @param snake
 	 */
-	private void printSnake(SnakeModel snake) {
+	private void printSnake() {
+		term.applyBackgroundColor(Color.YELLOW);
 		for(Position pos:snake.body){
 			if(pos.equals(snake.body.get(0))){
-				show("@", pos.x, pos.y);
+				show(" ", pos.x, pos.y);
 			}
 			else
-				show("O", pos.x, pos.y);
+				show(" ", pos.x, pos.y);
 		}
-
+		terminalSettings();
 	}
 
 	/**
@@ -181,7 +187,7 @@ public class Snake
 	 * @param snake
 	 * @param food
 	 */
-	private void printScore(SnakeModel snake) {
+	private void printScore() {
 		snake.eat=snake.hasEaten();
 		if(snake.eat){
 			score+=100+bonus;
@@ -196,17 +202,30 @@ public class Snake
 	 * @param food
 	 * @param spikes
 	 */
-	private void printFoodSpikes(SnakeModel snake) {
+	private void printFoodSpikes() {
+		if(gametimer%2==0)
+			applyColor(Color.CYAN);
+		else
+			term.applyBackgroundColor(Color.BLUE);
 		for(Position p:snake.food){
-			show("Q",p.x,p.y);
+			show(" ",p.x,p.y);
 		}
+		term.applyBackgroundColor(Color.RED);
 		for(Position p:snake.spikes){
-			show("X",p.x,p.y);
+			show(" ",p.x,p.y);
 		}
+		terminalSettings();
+	}
+
+	/**
+	 * 
+	 */
+	private void applyColor(Color cor) {
+		term.applyBackgroundColor(cor);
 	}
 
 	//END OF SNAKE CONTROL
-	
+
 	/**
 	 * Game Over
 	 * @param snake
@@ -299,12 +318,12 @@ public class Snake
 			started=true;
 			snake=newSnake();
 			snake.setDificulty(dificulty);
-			
+
 			gametimer=40;
 			pause=true;
 			snake.crashed=false;
 			end=false;
-	
+
 			score=0;
 		}
 		if(y==22){
@@ -330,13 +349,12 @@ public class Snake
 		}
 	}
 
-	 	
+
 	/**
 	 * Makes borders depending on the dificulty of the game.
-	 * @param snake 
 	 * @return 
 	 */
-	private LinkedList<Position> makeBorders(SnakeModel snake,LinkedList<Position> border) {
+	private LinkedList<Position> makeBorders(LinkedList<Position> border) {
 		Position aux=null;
 
 		for(int i=2;i<MAX_X-2;i++){
@@ -397,7 +415,7 @@ public class Snake
 		return border;
 	}
 
-	
+
 
 	/**
 	 * Determines position so that the string can be at the middle of the screen
@@ -411,8 +429,8 @@ public class Snake
 	}
 
 	//END OF VISUALIZATION -----------------------------------------------------------
-	
-	
+
+
 	//SNAKE CONTROL
 	/**
 	 * Selects the dificulty of the game
@@ -440,7 +458,7 @@ public class Snake
 			started=true;
 			end=false;
 		}
-		
+
 		score=0;
 		return snake;
 	}
@@ -451,10 +469,8 @@ public class Snake
 	 * @param food
 	 * @param border 
 	 */
-	private void whichWay(SnakeModel snake) {
+	private void whichWay() {
 		if(!end && !snake.crashed){
-			printBorders(border);
-			term.flush();
 			Key k = term.readInput();
 			if (k != null && !pause) {
 				started=true;
@@ -465,35 +481,30 @@ public class Snake
 					return;
 				case ArrowLeft: 
 					randx-=1;
-					new SnakeModel(randx, randy,length, Direction.LEFT);
 					snake.makeStep(Direction.LEFT);
 					break;
 				case ArrowRight:
 					randx+=1;
-					new SnakeModel(randx, randy,length, Direction.RIGHT);
 					snake.makeStep(Direction.RIGHT);
 					break;
 				case ArrowDown:
 					randy+=1;
-					new SnakeModel(randx, randy,length, Direction.DOWN);
 					snake.makeStep(Direction.DOWN);
 					break;
 				case ArrowUp:
 					randy-=1;
-					new SnakeModel(randx,randy,length, Direction.UP);
 					snake.makeStep(Direction.UP);
 					break;
 				default:
 					break;
-				}
-				
-				
+				}	
 			}
 			else{
 				if(!pause)
-					keepGoing(snake);
+					keepGoing();
 			}
-			
+			printSnake();
+
 		}
 		try{
 			Thread.sleep(snake.getDificulty());
@@ -501,16 +512,14 @@ public class Snake
 		catch(InterruptedException ie){
 			ie.printStackTrace();
 		}
-		term.clearScreen();
-		
-		printScore(snake);
-		printSnake(snake);
+
+	
 		if(bonus<=0)
 			bonus=0;
 		else{
 			bonus-=1;
 		}
-		
+
 	}
 
 	/**
@@ -518,10 +527,11 @@ public class Snake
 	 * @param snake
 	 * @param food
 	 */
-	private void keepGoing(SnakeModel snake) {
+	private void keepGoing() {
 		if(started){
 			snake.makestep();
-			
+			printSnake();
+
 		}
 	}
 
@@ -530,7 +540,7 @@ public class Snake
 	 * @param snake
 	 * @param spikes
 	 */
-	private void checkCrashed(SnakeModel snake) {
+	private void checkCrashed() {
 		if(snake.gotSpikes() || snake.hitMe() || outOfBounds(snake, border)){
 			snake.crashed=true;
 			end=true;

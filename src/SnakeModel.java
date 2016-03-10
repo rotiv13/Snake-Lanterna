@@ -95,7 +95,6 @@ class SnakeModel{
 	 * Makes all the targets/obstacles for the game
 	 */
 	public void produceObstaclesTargets() {
-		// TODO Auto-generated method stub
 		food=new LinkedList<Position>();
 		spikes=new LinkedList<Position>();
 		makeFood();
@@ -196,7 +195,6 @@ class SnakeModel{
 				auxy=body.getLast().getY()-1;
 			}
 			addEndOfTail(auxx, auxy);
-			new SnakeModel(auxx, auxy, 1, direction);
 		}
 	}
 
