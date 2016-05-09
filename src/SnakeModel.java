@@ -2,18 +2,17 @@ import java.util.LinkedList;
 import java.util.Random;
 
 class SnakeModel{
-	LinkedList<Position> body = new LinkedList<Position>();
-	Random rand = new Random();
-	Direction direction;
-	Position position;
+	LinkedList<Position> body = new LinkedList<>();
+	private Random rand = new Random();
+	private Direction direction;
 	boolean crashed = false;
 	boolean eat = false;
 	private int dificulty = 300;
 	private static final int HARD = 70;
 	private static final int MEDIUM = 120;
 	private static final int EASY = 170;
-	LinkedList<Position> food = new LinkedList<Position>();
-	LinkedList<Position> spikes = new LinkedList<Position>();
+	LinkedList<Position> food = new LinkedList<>();
+	LinkedList<Position> spikes = new LinkedList<>();
 	SnakeModel(int x,int y,int length, Direction dir){
 		if(oposite(dir)){
 			setDirection(dir);
@@ -45,16 +44,7 @@ class SnakeModel{
 	 * @return
 	 */
 	private boolean oposite(Direction dir) {
-		if(direction==Direction.LEFT && dir==Direction.RIGHT)
-			return false;
-		if(direction==Direction.UP && dir==Direction.DOWN)
-			return false;
-		if(direction==Direction.DOWN && dir==Direction.UP)
-			return false;
-		if(direction==Direction.RIGHT && dir==Direction.LEFT)
-			return false;
-		else
-			return true;
+		return !(direction == Direction.LEFT && dir == Direction.RIGHT) && !(direction == Direction.UP && dir == Direction.DOWN) && !(direction == Direction.DOWN && dir == Direction.UP) && !(direction == Direction.RIGHT && dir == Direction.LEFT);
 	}
 
 	/**
@@ -85,16 +75,14 @@ class SnakeModel{
 
 	}
 
-	public boolean equals(Position pos){
-		if(body.get(0).x==pos.x && body.get(0).y==pos.y)
-			return true;
-		return false;
+	boolean equals(Position pos){
+		return body.get(0).x == pos.x && body.get(0).y == pos.y;
 
 	}
 	/**
 	 * Makes all the targets/obstacles for the game
 	 */
-	public void produceObstaclesTargets() {
+	void produceObstaclesTargets() {
 		food=new LinkedList<Position>();
 		spikes=new LinkedList<Position>();
 		makeFood();
@@ -103,7 +91,6 @@ class SnakeModel{
 
 	/**
 	 * Makes food for the snake to eat
-	 * @param food
 	 * @return
 	 */
 	private void makeFood() {
@@ -126,7 +113,6 @@ class SnakeModel{
 
 	/**
 	 * Makes those nasty obstacles
-	 * @param spikes
 	 * @return
 	 */
 	private void makeSpikes() {
@@ -143,10 +129,7 @@ class SnakeModel{
 
 	/**
 	 * Produces food on with the size, that depends on the dificulty
-	 * @param food
-	 * @param r
-	 * @param size
-	 * @return 
+	 * @return
 	 */
 	private void produceFood( Random r, int size) {
 		Position f;
@@ -158,10 +141,7 @@ class SnakeModel{
 
 	/**
 	 * Produces spikes on with the size, that depends on the dificulty 
-	 * @param spikes
-	 * @param r
-	 * @param size
-	 * @return 
+	 * @return
 	 */
 	private void produceSpikes( Random r, int size) {
 		Position f;
@@ -198,7 +178,11 @@ class SnakeModel{
 		}
 	}
 
-
+	/**
+	 * Adss a new end of tail
+	 * @param auxx
+	 * @param auxy
+     */
 	private void addEndOfTail(int auxx, int auxy) {
 		body.add(new Position(auxx,auxy));
 	}
@@ -207,7 +191,7 @@ class SnakeModel{
 	 * Checks if the snake has eaten a fruit
 	 * @return
 	 */
-	public boolean hasEaten(){
+	boolean hasEaten(){
 		for(int i=0;i<food.size();i++){
 			if(equals(food.get(i))){
 				food.set(i,new Position(rand.nextInt(90)+4, rand.nextInt(20)+4));
@@ -221,9 +205,9 @@ class SnakeModel{
 	 * Checks if the snake has collided with a spike
 	 * @return
 	 */
-	public boolean gotSpikes(){
-		for(int i=0;i<spikes.size();i++){
-			if(equals(spikes.get(i))){
+	boolean gotSpikes(){
+		for (Position spike : spikes) {
+			if (equals(spike)) {
 				return true;
 			}
 		}	
@@ -234,7 +218,7 @@ class SnakeModel{
 	 * Check if it collided with itself
 	 * @return
 	 */
-	public boolean hitMe(){
+	boolean hitMe(){
 		for(int i=2;i<body.size();i++){
 			if(equals(body.get(i))){
 				return true;
@@ -243,23 +227,14 @@ class SnakeModel{
 		return false;
 	}
 	//END OF SNAKE CONTROL ----------------------------------------------------------
-	public Direction getDirection() {
-		return direction;
-	}
-
-	public void setDirection(Direction direction) {
+	private void setDirection(Direction direction) {
 		this.direction = direction;
 	}
 
-	public Position getPosition() {
-		return position;
-	}
-
-	public void setPosition(Position position) {
-		this.position = position;
-	}
-
-	public void makestep(){
+	/**
+	 * Makes the next step
+	 */
+	void makestep(){
 		makeStep(direction);
 	}
 
@@ -267,17 +242,17 @@ class SnakeModel{
 	 * Pushes forward in that direction dir
 	 * @param dir
 	 */
-	public void makeStep(Direction dir){
+	void makeStep(Direction dir){
 		eatAndGrow();
 		dontGoTheOppositeDirection(dir);
 
 	}
 
-	public int getDificulty() {
+	int getDificulty() {
 		return dificulty;
 	}
 
-	public void setDificulty(int dificulty) {
+	void setDificulty(int dificulty) {
 		this.dificulty = dificulty;
 		produceObstaclesTargets();
 	}

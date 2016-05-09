@@ -8,7 +8,6 @@ import com.googlecode.lanterna.input.*;
 
 /**
  * @author Vitor Afonso up200908303
- * @author Jorge Silva up201002605 
  */
 public class Snake
 {
@@ -16,20 +15,20 @@ public class Snake
 	private static final int MEDIUM = 120;
 	private static final int EASY = 170;
 	private Terminal term;
-	Random rand=new Random();
+	private Random rand=new Random();
 	private int MAX_Y;
 	private int MAX_X;
-	int gametimer=40;
-	boolean started=false;
-	boolean end=false;
-	boolean pause=true;
+	private int gametimer=40;
+	private boolean started=false;
+	private boolean end=false;
+	private boolean pause=true;
 	private int randx=0;
 	private int randy=0;
 	private int score=0;
 	private int bonus=50;
-	LinkedList<Position> border;
-	SnakeModel snake;
-	public Snake(){
+	private LinkedList<Position> border;
+	private SnakeModel snake;
+	private Snake(){
 		term = TerminalFacade.createTerminal();
 		term.enterPrivateMode();
 		MAX_X=term.getTerminalSize().getColumns();
@@ -38,7 +37,7 @@ public class Snake
 		randx=rand.nextInt(MAX_X-10)+5;
 		snake=newSnake();
 
-		border = new LinkedList<Position>();
+		border = new LinkedList<>();
 		while (true){
 			terminalSettings();
 			//MENU
@@ -72,7 +71,7 @@ public class Snake
 				}
 
 
-				border=makeBorders(new LinkedList<Position>());
+				border=makeBorders(new LinkedList<>());
 			}
 			term.clearScreen();
 			printFoodSpikes();
@@ -129,7 +128,6 @@ public class Snake
 
 	/**
 	 * Prints the waiting sign on top of the terminal and sets the start of the game
-	 * @param snake
 	 */
 	private void loadingScreen() {
 		term.clearScreen();
@@ -167,8 +165,6 @@ public class Snake
 
 	/**
 	 * Print snake
-	 * @param i 
-	 * @param snake
 	 */
 	private void printSnake() {
 		term.applyBackgroundColor(Color.YELLOW);
@@ -184,8 +180,6 @@ public class Snake
 
 	/**
 	 * Print Score
-	 * @param snake
-	 * @param food
 	 */
 	private void printScore() {
 		snake.eat=snake.hasEaten();
@@ -199,8 +193,6 @@ public class Snake
 
 	/**
 	 * Prints all the obstacles/objectives on the board
-	 * @param food
-	 * @param spikes
 	 */
 	private void printFoodSpikes() {
 		if(gametimer%2==0)
@@ -228,9 +220,6 @@ public class Snake
 
 	/**
 	 * Game Over
-	 * @param snake
-	 * @param food
-	 * @param spikes
 	 * @return
 	 */
 	private SnakeModel gameOver() {
@@ -273,8 +262,6 @@ public class Snake
 
 	/**
 	 * Prints the game over sign
-	 * @param y
-	 * @param x
 	 */
 	private void gameOverScreen(int y, int x) {
 		String scores="Your Score: "+Integer.toString(score);
@@ -308,9 +295,6 @@ public class Snake
 
 	/**
 	 * Check which of the selections on the game over screen has been selected
-	 * @param snake
-	 * @param dificulty
-	 * @param y
 	 * @return
 	 */
 	private SnakeModel gameOverRestart(int dificulty, int y) {
@@ -434,7 +418,6 @@ public class Snake
 	//SNAKE CONTROL
 	/**
 	 * Selects the dificulty of the game
-	 * @param snake
 	 * @param y
 	 * @return
 	 */
@@ -465,9 +448,6 @@ public class Snake
 
 	/**
 	 * Moving snake same direction or change direction
-	 * @param snake
-	 * @param food
-	 * @param border 
 	 */
 	private void whichWay() {
 		if(!end && !snake.crashed){
@@ -524,8 +504,6 @@ public class Snake
 
 	/**
 	 * Snake keeps moving on the direction of the last step
-	 * @param snake
-	 * @param food
 	 */
 	private void keepGoing() {
 		if(started){
@@ -537,8 +515,6 @@ public class Snake
 
 	/**
 	 * See if the snake hit something or itself
-	 * @param snake
-	 * @param spikes
 	 */
 	private void checkCrashed() {
 		if(snake.gotSpikes() || snake.hitMe() || outOfBounds(snake, border)){
